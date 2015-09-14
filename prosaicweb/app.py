@@ -3,6 +3,8 @@ from flask import Flask, render_template, request, redirect
 from pyhocon import ConfigFactory
 # TODO https://github.com/zeekay/flask-uwsgi-websocket
 
+from models import Corpus
+
 SITE_NAME = 'prosaicweb'
 # TODO should be something in /etc or whatever
 DEFAULT_CONFIG = './prosaicweb.conf'
@@ -23,7 +25,12 @@ def get_index():
 
 @app.route('/upload', methods=['GET'])
 def get_upload():
-    return "upload a thing"
+    context = {
+        "corpora": [Corpus("hello", "foo"),
+                    Corpus("there", "bar"),
+                    Corpus("how", "baz")],
+    }
+    return render_template('upload.html', **context)
 
 @app.route('/upload', methods=['POST'])
 def post_upload():
@@ -37,7 +44,12 @@ def get_generate():
 def post_generate():
     pass
 
+@app.route('/corpora/<corpus_id>', methods=['GET'])
+def get_corpora(corpus_id):
+    return Corpus('random', 'inventing situations').body
+
 if __name__ == '__main__':
     # TODO take option:
     app.config['CONFIG_PATH'] = DEFAULT_CONFIG
+    app.config['DEBUG'] = True
     app.run()
