@@ -1,0 +1,5 @@
+# prosaic... manually installed for now, can't fit it on pypi
+
+flask=0.10.1
+pymongo=3.0.3
+celery=3.1.18
