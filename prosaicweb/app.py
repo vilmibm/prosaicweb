@@ -19,7 +19,7 @@ def cfg(k):
 
 @app.route('/', methods=['GET'])
 def get_index():
-    return "index"
+    return render_template('index.html', **{})
 
 @app.route('/upload', methods=['GET'])
 def get_upload():
