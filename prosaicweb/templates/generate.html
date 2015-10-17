@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>generate some poetry</title>
+    </head>
+    <body>
+        <ol>
+            <li>pick a corpus</li>
+            <li>choose or write a template</li>
+            <li>(re)generate</li>
+        </ol>
+        <form action="/generate" method="post">
+            <h1>corpus</h1>
+            <select>
+                {% for corpus in corpora %}
+                <option>{{ corpus }}</option>
+                {% endfor %}
+            </select>
+            <button>create new corpus</button>
+
+            <h1>template</h1>
+            <select>
+                {% for template in templates %}
+                <option> {{template}} </option>
+                {% endfor %}
+            </select>
+            <p>u can also write one from scratch</p>
+            <textarea name="template_raw"></textarea>
+
+
+
+
+
+            <br>
+            <input type="submit"  value="generate">
+        </form>
+    </body>
+</html>

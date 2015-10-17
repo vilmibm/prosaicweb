@@ -3,3 +3,4 @@
 flask=0.10.1
 pymongo=3.0.3
 celery=3.1.18
+prosaic=3.5.0
