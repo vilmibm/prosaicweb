@@ -1,29 +1,32 @@
 // generate.js
 // code for the poetry generation form
 console.log('loaded generate.js');
+
+if (!CodeMirror) {
+    throw "Missing requirement CodeMirror";
+}
+
 (function () {
-    var template_select = document.querySelector('#templates');
-    var template_textarea = document.querySelector('textarea');
-    var form = document.querySelector('form');
-    var output = document.querySelector('#output');
-    var preselected_template_option = template_select.selectedOptions[0];
+    // grumph
+    var qs = document.querySelector.bind(document);
 
-    template_textarea.update = function (new_content) {
-        // content is going to be a json string. we do a dumb hack here to get
-        // it pretty-printed:
-        this.innerHTML = JSON.stringify(JSON.parse(new_content), undefined, 2);
-    }
-
-    // events
-    var template_selected = function (e) {
-        var option = e.explicitOriginalTarget;
-        template_textarea.update(option.dataset.content);
+    // TODO this is a stupid hack.
+    JSON.pretty_print = function (json_string) {
+        return this.stringify(this.parse(json_string), undefined, 2);
     };
 
-    var successful_generation = function (e) {
+    // events
+    var template_selected = function (state, e) {
+        var option = e.explicitOriginalTarget;
+        state.template_editor.setValue(JSON.pretty_print(option.dataset.content));
+    };
+
+    var successful_generation = function (state, e) {
         var lines = JSON.parse(e.target.response).result;
         var pre = document.createElement('pre');
         pre.innerHTML = lines.join("\n");
+        // TODO add this hr in; or, just use css
+        var hr = document.createElement('hr');
         var existing_poems = output.querySelectorAll('pre');
         if (existing_poems.length == 0) {
             output.appendChild(pre);
@@ -33,22 +36,28 @@ console.log('loaded generate.js');
         }
     };
 
-    var submit_generation = function (e) {
+    var submit_generation = function (state, e) {
         e.preventDefault();
 
-        var form_data = new FormData(form);
+        var form_data = new FormData(state.form);
         var request = new XMLHttpRequest();
 
         request.open("POST", "/generate");
         request.send(form_data);
-        request.addEventListener('load', successful_generation);
+        request.addEventListener('load', successful_generation.bind(null, state));
     };
 
-    // helpers
-
     // init
-    template_select.addEventListener('change', template_selected);
-    form.addEventListener('submit', submit_generation, true);
+    var state = {
+        template_select: qs('#templates'),
+        form: qs('form'),
+        output: qs('#output'),
+        preselected_template_option: qs('#templates').selectedOptions[0],
+        template_editor: CodeMirror.fromTextArea(qs('textarea'), {mode:'javascript'})
+    };
 
-    template_textarea.update(preselected_template_option.dataset.content);
+    state.template_select.addEventListener('change', template_selected.bind(null, state));
+    state.form.addEventListener('submit', submit_generation.bind(null, state), true);
+
+    state.template_editor.setValue(JSON.pretty_print(state.preselected_template_option.dataset.content));
 })();
