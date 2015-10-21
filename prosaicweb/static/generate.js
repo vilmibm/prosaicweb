@@ -21,10 +21,6 @@ if (!CodeMirror) {
         state.template_editor.setValue(JSON.pretty_print(option.dataset.content));
     };
 
-    var delete_poem = function (state, e) {
-        e.target.container.remove();
-    };
-
     var successful_generation = function (state, e) {
         var lines = JSON.parse(e.target.response).result;
 
@@ -40,7 +36,7 @@ if (!CodeMirror) {
 
         var close_button = document.createElement('button');
         close_button.innerHTML = 'X';
-        close_button.addEventListener('click', delete_poem.bind(null, state));
+        close_button.addEventListener('click', function(e) {e.target.container.remove();});
         close_button.container = poem_container;
         poem_controls.appendChild(close_button);
 
