@@ -1,34 +1,40 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <meta charset="UTF-8">
         <title>generate some poetry</title>
+        <link rel="stylesheet" href="/static/generate.css">
     </head>
     <body>
-        <ol>
-            <li>pick a corpus</li>
-            <li>choose or write a template</li>
-            <li>(re)generate</li>
-        </ol>
-        <form>
-            <h1>corpus</h1>
-            <select name="corpus">
-                {% for corpus in corpora %}
-                <option>{{ corpus }}</option>
-                {% endfor %}
-            </select>
-            <button>create new corpus</button>
+        <div id="content">
+            <div id="col0">
+                <form>
+                    <h1>corpus</h1>
+                    <select name="corpus">
+                        {% for corpus in corpora %}
+                        <option>{{ corpus }}</option>
+                        {% endfor %}
+                    </select>
+                    <button>create new corpus</button>
 
-            <h1>template</h1>
-            <select id="templates" name="template_name">
-                {% for template in templates %}
-                <option value="{{template.name}}" data-content="{{template.json}}"> {{template.name}} </option>
-                {% endfor %}
-            </select> <button>create new template</button>
-            <p>you can pre-load an existing template into the text box below and then tweak as yr beautiful heart desires.</p>
-            <textarea rows="30" cols="100" name="template_raw"></textarea>
-            <br>
-            <input type="submit"  value="generate">
-        </form>
+                    <h1>template</h1>
+                    <select id="templates" name="template_name">
+                        {% for template in templates %}
+                        <option value="{{template.name}}" data-content="{{template.json}}"> {{template.name}} </option>
+                        {% endfor %}
+                    </select> <button>create new template</button>
+                    <p>you can pre-load an existing template into the text box below and then tweak as yr beautiful heart desires.</p>
+                    <textarea rows="30" name="template_raw"></textarea>
+                    <br>
+                    <input type="submit"  value="generate">
+                </form>
+            </div>
+            <div id="col1">
+                <h1>output</h1>
+                <div id="output">
+                </div>
+            </div>
+        </div>
         <script src="/static/generate.js"></script>
     </body>
 </html>
