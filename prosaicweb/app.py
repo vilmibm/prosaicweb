@@ -1,6 +1,7 @@
+import json
 from functools import lru_cache
 
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, jsonify
 from pyhocon import ConfigFactory
 from prosaic.cthulhu import poem_from_template
 from pymongo import MongoClient
@@ -37,13 +38,23 @@ def post_upload():
 
 @app.route('/generate', methods=['GET'])
 def get_generate():
-    context = {'templates': Template.list(),
+    templates = [{'name': t['name'],
+                  'json': json.dumps(t['lines'])}
+                 for t in Template.list()]
+    context = {'templates': templates,
                'corpora': Corpus.list_names()}
     return render_template('generate.html', **context)
 
 @app.route('/generate', methods=['POST'])
 def post_generate():
-    return '{"hi":"there"}'
+    print(request.form)
+    template = json.loads(request.form['template_raw'])
+    corpus = request.form['corpus']
+    db = MongoClient()[corpus].phrases
+    lines = poem_from_template(template, db)
+    raw_lines = map(lambda l: l['raw'], lines)
+
+    return jsonify(result=list(raw_lines))
 
 @app.route('/corpora/<corpus_id>', methods=['GET'])
 def get_corpora(corpus_id):

@@ -21,7 +21,7 @@
             <h1>template</h1>
             <select id="templates" name="template_name">
                 {% for template in templates %}
-                <option value="{{template.name}}" data-content="{{template.lines}}"> {{template.name}} </option>
+                <option value="{{template.name}}" data-content="{{template.json}}"> {{template.name}} </option>
                 {% endfor %}
             </select> <button>create new template</button>
             <p>you can pre-load an existing template into the text box below and then tweak as yr beautiful heart desires.</p>

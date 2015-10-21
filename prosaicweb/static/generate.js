@@ -12,6 +12,11 @@ console.log('loaded generate.js');
         template_textarea.innerHTML = option.dataset.content;
     };
 
+    var successful_generation = function (e) {
+        var lines = JSON.parse(e.target.response).result;
+        console.log(lines);
+    };
+
     var submit_generation = function (e) {
         e.preventDefault();
         var form_data = new FormData(form);
@@ -19,6 +24,7 @@ console.log('loaded generate.js');
 
         request.open("POST", "/generate");
         request.send(form_data);
+        request.addEventListener('load', successful_generation);
 
         return false;
     };
