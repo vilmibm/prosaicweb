@@ -13,9 +13,24 @@ body {
 
 #col1 {
     width: 40%;
-    float:right;
+    float: right;
 }
 
 textarea {
     width: 100%;
+}
+
+.poem_container {
+    border: 1px dashed black;
+    overflow: hidden;
+}
+
+.poem_controls {
+    float: left;
+    width: 5%;
+}
+
+.poem {
+    float: right;
+    width: 90%;
 }
