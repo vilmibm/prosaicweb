@@ -7,7 +7,7 @@ from pymongo import MongoClient
 
 # TODO https://github.com/zeekay/flask-uwsgi-websocket
 
-from models import Corpus
+from models import Corpus, Template
 
 SITE_NAME = 'prosaicweb'
 DEFAULT_CONFIG = './prosaicweb.conf'
@@ -23,12 +23,13 @@ def get_index():
 
 @app.route('/upload', methods=['GET'])
 def get_upload():
-    context = {
-        'corpora': [Corpus('hello', 'foo'),
-                    Corpus('there', 'bar'),
-                    Corpus('how', 'baz')],
-    }
-    return render_template('upload.html', **context)
+    return 'hi'
+    #context = {
+    #    'corpora': [Corpus('hello', 'foo'),
+    #                Corpus('there', 'bar'),
+    #                Corpus('how', 'baz')],
+    #}
+    #return render_template('upload.html', **context)
 
 @app.route('/upload', methods=['POST'])
 def post_upload():
@@ -36,19 +37,18 @@ def post_upload():
 
 @app.route('/generate', methods=['GET'])
 def get_generate():
-    dbclient = MongoClient()
-    # TODO get list of templates
-    context = {'templates': ['haiku', 'sonnet', 'sestina'],
-               'corpora': dbclient.database_names()}
+    context = {'templates': Template.list(),
+               'corpora': Corpus.list_names()}
     return render_template('generate.html', **context)
 
 @app.route('/generate', methods=['POST'])
 def post_generate():
-    pass
+    return '{"hi":"there"}'
 
 @app.route('/corpora/<corpus_id>', methods=['GET'])
 def get_corpora(corpus_id):
-    return Corpus('random', 'inventing situations').body
+    return corpus_id
+    #return Corpus('random', 'inventing situations').body
 
 @app.route('/haiku')
 def get_haiku():

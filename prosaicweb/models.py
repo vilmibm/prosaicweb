@@ -1,43 +1,49 @@
 '''i don't even like this real talk'''
-from uuid import uuid1
 from pymongo import MongoClient
 
+DBNAME = 'prosaicweb'
+
+# TODO lru cache
+# ideally these would be static class things inside Model:
+def client():
+    return MongoClient()
+
+def db():
+    return client()[DBNAME]
+
 class Model:
-    # class methods
-    def list_names():
+    col = None # Override in subclasses
+
+    @classmethod
+    def list_names(klass):
         """list of the names of all things of this type"""
-        pass
+        things = klass.list()
+        return list(map(lambda t: t['name'], things))
 
-    def list():
+    @classmethod
+    def list(klass):
         """list all of models of this type"""
-        pass
+        return list(klass.col.find({}))
 
-    def find(attrs):
-        pass
+    @classmethod
+    def find(klass, attrs):
+        return list(klass.col.find(attrs))
 
-    # instance methods
-    def __init__(self, collection, data, docid=None):
+    def __init__(self, data):
         self.data = data
-        self.col = collection
-        self._id = docid
 
     def save(self):
-        self.col.insert_one()
-        pass
+        self.col.update({'name':self.data['name']}, self.data, True)
 
+class Template(Model):
+    col = db().templates
 
-class Corpus:
-    def __init__(self, name, body):
-        self.id = uuid1()
-        self.name = name
-        self.body = body
+class Corpus(Model):
+    @classmethod
+    def list_names(klass):
 
-    def get(corpus_id):
-        # TODO look up by id, instantiate
-        return Corpus('todo', 'todo')
+        # TODO filter
+        return client().database_names()
 
-class Source:
-    pass
-
-class Template:
+class Source(Model):
     pass
