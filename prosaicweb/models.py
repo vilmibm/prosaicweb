@@ -38,12 +38,9 @@ class Model:
 class Template(Model):
     col = db().templates
 
-class Corpus(Model):
+class Source(Model):
+    col = db().phrases
+
     @classmethod
     def list_names(klass):
-
-        # TODO filter
-        return client().database_names()
-
-class Source(Model):
-    pass
+        return klass.col.distinct('source')

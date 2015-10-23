@@ -22,7 +22,9 @@ if (!CodeMirror) {
     };
 
     var successful_generation = function (state, e) {
-        var lines = JSON.parse(e.target.response).result;
+        var poem = JSON.parse(e.target.response);
+        var lines = poem.lines;
+        var sources = poem.used_sources;
 
         var poem_container = document.createElement('div');
         poem_container.className = 'poem_container';
@@ -40,16 +42,21 @@ if (!CodeMirror) {
         close_button.container = poem_container;
         poem_controls.appendChild(close_button);
 
+        var sources_list = document.createElement('sub');
+        sources_list.innerHTML = 'sources: ';
+        sources_list.innerHTML += sources.join(', ');
+
         poem_container.appendChild(poem_controls);
         poem_container.appendChild(pre);
+        poem_container.appendChild(sources_list);
 
-        var existing_poems = output.querySelectorAll('.poem_container');
+        var existing_poems = state.output.querySelectorAll('.poem_container');
 
         if (existing_poems.length == 0) {
-            output.appendChild(poem_container);
+            state.output.appendChild(poem_container);
         }
         else {
-            output.insertBefore(poem_container, existing_poems[0]);
+            state.output.insertBefore(poem_container, existing_poems[0]);
         }
     };
 

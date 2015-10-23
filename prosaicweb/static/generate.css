@@ -24,6 +24,10 @@ textarea {
     border: 1px dashed black;
     overflow: hidden;
 }
+  .poem_container sub {
+      display: block;
+      clear:both;
+  }
 
 .poem_controls {
     float: left;
