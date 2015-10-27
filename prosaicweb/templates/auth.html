@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>register or login</title>
+    </head>
+    <body>
+        <h1>login</h1>
+        <span class="msg">{{ login_msg }}</span>
+        <form method="post" action="/login">
+            <p>
+            name: <input name="name" type="text" required="true">
+            </p>
+            <p>
+            password: <input name="password" required="true" type="password">
+            </p>
+            <input type="submit" value="log in">
+        </form>
+
+        <h1>register</h1>
+        <span class="msg">{{ register_msg }}</span>
+        <form method="post" action="/register">
+            <p>
+                name: <input required="true" name="name" type="text">
+            </p>
+            <p>
+                password: <input required="true" name="password" type="password">
+            </p>
+            <p>
+                captcha:
+                <select name="captcha" required="true">
+                    <option value="quux">you see a turtle in the desert</option>
+                    <option value="foo">when all of a sudden you look down and see a tortoise</option>
+                    <option value="baz" >it is crawling towards you</option>
+                    <option value="quz">you reach down and flip the tortoise over on its back</option>
+                    <option value="bar" >you are not helping</option>
+                    <option value="qux">ACTUALLY I AM NOT A ROBOT</option>
+                </select>
+            </p>
+            <input type="submit" value="register">
+        </form>
+    </body>
+</html>

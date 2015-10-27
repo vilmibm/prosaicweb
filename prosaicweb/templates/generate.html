@@ -6,16 +6,24 @@
         <link rel="stylesheet" href="/static/generate.css">
         <link rel="stylesheet" href="/static/codemirror/codemirror.css">
     </head>
+    {% if user_name %}
+    <form id="logout" action="/logout" method="post">
+        logged in as {{ user_name }} <input type="submit" value="log out">
+    </form>
+    {% endif %}
     <body>
         <div id="content">
             <div id="col0">
-                <form>
+                <form id="generate">
                     <h1>sources</h1>
                     <select name="source" multiple="true">
                         {% for source in sources %}
                         <option>{{source}}</option>
                         {% endfor %}
                     </select>
+                    <p>
+                    <input type="checkbox" name="truncate"><span>truncate longer sources to match shortest source?</span>
+                    </p>
 
                     <h1>template</h1>
                     <select id="templates" name="template_name">

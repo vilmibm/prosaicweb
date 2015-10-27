@@ -74,7 +74,7 @@ if (!CodeMirror) {
     // init
     var state = {
         template_select: qs('#templates'),
-        form: qs('form'),
+        form: qs('#generate'),
         output: qs('#output'),
         preselected_template_option: qs('#templates').selectedOptions[0],
         template_editor: CodeMirror.fromTextArea(qs('textarea'), {mode:'javascript'})

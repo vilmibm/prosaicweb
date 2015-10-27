@@ -26,8 +26,16 @@ class Model:
         return list(klass.col.find({}))
 
     @classmethod
-    def find(klass, attrs):
-        return list(klass.col.find(attrs))
+    def find(klass, **kwargs):
+        return list(klass.col.find(kwargs))
+
+    @classmethod
+    def find_one(klass, **kwargs):
+        # TODO mongo find_one?
+        found = klass.find(**kwargs)
+        if len(found) > 0:
+            return found[0]
+        return None
 
     def __init__(self, data):
         self.data = data
@@ -44,3 +52,6 @@ class Source(Model):
     @classmethod
     def list_names(klass):
         return klass.col.distinct('source')
+
+class User(Model):
+    col = db().users
