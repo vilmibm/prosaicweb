@@ -63,7 +63,7 @@ if (!CodeMirror) {
     var submit_generation = function (state, e) {
         e.preventDefault();
 
-        var form_data = new FormData(state.form);
+        var form_data = new FormData(state.generate_form);
         var request = new XMLHttpRequest();
 
         request.open("POST", "/generate");
@@ -71,16 +71,34 @@ if (!CodeMirror) {
         request.addEventListener('load', successful_generation.bind(null, state));
     };
 
+    var upload_file = function (state, e) {
+        e.preventDefault();
+
+        var form_data = new FormData(state.upload_form);
+        var request = new XMLHttpRequest();
+
+        request.open("POST", "/upload");
+        request.send(form_data);
+        request.addEventListener('load', successful_upload.bind(null, state));
+    };
+
+    var successful_upload = function (state, e) {
+        console.log('tea leaves thwart');
+        // TODO need to add entry to the sources list
+    };
+
     // init
     var state = {
         template_select: qs('#templates'),
-        form: qs('#generate'),
+        generate_form: qs('#generate'),
         output: qs('#output'),
         preselected_template_option: qs('#templates').selectedOptions[0],
-        template_editor: CodeMirror.fromTextArea(qs('textarea'), {mode:'javascript'})
+        template_editor: CodeMirror.fromTextArea(qs('textarea'), {mode:'javascript'}),
+        upload_form: qs('#upload')
     };
 
     state.template_select.addEventListener('change', template_selected.bind(null, state));
-    state.form.addEventListener('submit', submit_generation.bind(null, state), true);
+    state.generate_form.addEventListener('submit', submit_generation.bind(null, state), true);
     state.template_editor.setValue(JSON.pretty_print(state.preselected_template_option.dataset.content));
+    state.upload_form.addEventListener('submit', upload_file.bind(null, state));
 })();

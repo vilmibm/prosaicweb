@@ -49,9 +49,35 @@ class Template(Model):
 class Source(Model):
     col = db().phrases
 
+    # TODO kill me
+    @classmethod
+    def find_one(klass, **kwargs):
+        source_name = kwargs.get('name', None)
+        if not source_name:
+            return None
+
+        matching = list(filter(lambda n: source_name == n, klass.list_names()))
+
+        if matching:
+            return {'name': matching[0]}
+
     @classmethod
     def list_names(klass):
         return klass.col.distinct('source')
 
 class User(Model):
     col = db().users
+
+    @property
+    def uploads_locked(self):
+        return self.col.find_one(**self.data).get('uplpoads_locked', False)
+
+    def lock_uploads(self):
+        self.data['uploads_locked'] = True
+        self.save()
+
+    def unlock_uploads(self):
+        self.data['uploads_locked'] = False
+        self.save()
+
+

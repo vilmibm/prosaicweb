@@ -10,17 +10,34 @@
     <form id="logout" action="/logout" method="post">
         logged in as {{ user_name }} <input type="submit" value="log out">
     </form>
+    <form id="upload">
+        <p>
+            since yu are logged in yu can upload yr own text files (limit 5mb):
+        </p>
+        <p>
+            name of file: <input required="true" name="upload_name" type="text">
+        </p>
+        <p>
+            <input required="true" name="upload" type="file">
+        </p>
+        <p>
+            <input type="submit" value="upload!">
+        </p>
+    </form>
     {% endif %}
     <body>
         <div id="content">
             <div id="col0">
                 <form id="generate">
                     <h1>sources</h1>
-                    <select name="source" multiple="true">
-                        {% for source in sources %}
-                        <option>{{source}}</option>
-                        {% endfor %}
-                    </select>
+                    <p>
+                      <select required="true" id="sources" name="source" multiple="true">
+                          {% for source in sources %}
+                          <option>{{source}}</option>
+                          {% endfor %}
+                      </select>
+
+                    </p>
                     <p>
                     <input type="checkbox" name="truncate"><span>truncate longer sources to match shortest source?</span>
                     </p>
@@ -30,7 +47,7 @@
                         {% for template in templates %}
                         <option value="{{template.name}}" data-content="{{template.json}}"> {{template.name}} </option>
                         {% endfor %}
-                    </select> <button>create new template</button>
+                    </select>
                     <p>you can pre-load an existing template into the text box below and then tweak as yr beautiful heart desires.</p>
                     <textarea rows="30" name="template_raw"></textarea>
                     <br>

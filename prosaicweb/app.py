@@ -2,9 +2,10 @@ import json
 import random
 from functools import lru_cache
 
-from flask import Flask, render_template, request, redirect, jsonify
+from flask import Flask, render_template, request, redirect, jsonify, Response
 from pyhocon import ConfigFactory
 from prosaic.cthulhu import poem_from_template
+from prosaic.nyarlathotep import process_text
 from pymongo import MongoClient
 
 # TODO https://github.com/zeekay/flask-uwsgi-websocket
@@ -19,6 +20,7 @@ app = Flask('prosaicweb')
 config = ConfigFactory.parse_file(DEFAULT_CONFIG)
 app.config['DEBUG'] = True
 app.config['SECRET_KEY'] = 'TESTING LOL'
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024 # 5mb
 
 def collection_name(sources, truncate):
     """TODO"""
@@ -45,7 +47,7 @@ def get_generate():
                'user_name': user_name}
     return render_template('generate.html', **context)
 
-@app.route('/', methods=['POST'])
+@app.route('/generate', methods=['POST'])
 def post_generate():
     truncate = request.form.get('truncate', None)
     sources = request.form.getlist('source')
@@ -88,6 +90,41 @@ def post_generate():
     raw_lines = map(lambda l: l['raw'], lines)
 
     return jsonify(lines=list(raw_lines), used_sources=list(used_sources))
+
+@app.route('/upload', methods=['POST'])
+def post_upload():
+    user_name = request.cookies.get('user_name')
+    user = User(User.find_one(name=user_name))
+    file_name = request.form['upload_name']
+
+    # TODO json errors
+    if not (user_name and user):
+        return Response('file upload requires auth', 401)
+
+    # TODO lock timeouts in case of server timeout
+    if user.uploads_locked:
+        return Response('Already uploading a thing.', 400)
+
+    source = Source.find_one(name=file_name)
+
+    if source is not None:
+        # TODO json errors
+        return Response('Already a source with that name oops.', 400)
+
+    print('proceeding with upload {} for {}'.format(file_name, user_name))
+
+    try:
+        user.lock_uploads()
+        content = str(request.files.get('upload').read())
+        col = MongoClient().prosaicweb.phrases
+        process_text(content, file_name, col)
+    except Exception as e:
+        # TODO content type
+        return Response(json.dumps({'exception':e.__str__(), 'error': 'parse_exception'}), 400)
+    finally:
+        user.unlock_uploads()
+
+    return Response(json.dumps({'name':file_name}))
 
 @app.route('/auth', methods=['GET'])
 def get_auth():

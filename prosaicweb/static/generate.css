@@ -16,6 +16,11 @@ body {
     float: right;
 }
 
+#sources {
+    width: 60%;
+    height: 10em;
+}
+
 textarea {
     width: 100%;
 }
