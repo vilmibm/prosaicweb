@@ -95,25 +95,37 @@ def get_auth():
 
 @app.route('/register', methods=['POST'])
 def post_register():
-    print('registering new user', user_name)
+
     user_name = request.form.get('name')
     password = request.form.get('password')
-    user = User.find_one(name=user_name)
-    if user is None:
-        print('user not found, creating')
-        user = User({'name': user_name,
-                     'password': password})
-        user.save()
-        return render_template('auth.html', login_msg='registration complete, yu can log in now')
+    captcha = request.form.get('captcha')
+    context = {}
+
+    print('registering new user', user_name)
+    if captcha != 'qux':
+        print('captcha failed, erroring')
+        context['login_msg'] = 'oops, are you human?'
     else:
-        print('user found, erroring')
-        return render_template('auth.html', register_msg='name is taken, sorry')
+        user = User.find_one(name=user_name)
+        if user is None:
+            print('user not found, creating')
+            user = User({'name': user_name,
+                         'password': password})
+            user.save()
+            context['login_msg'] = 'registration complete, yu can log in now'
+        else:
+            print('user found, erroring')
+            context['register_msg'] = 'name is taken, sorry'
+
+    # TODO should do a redirect but lol
+    return render_template('auth.html', **context)
 
 @app.route('/login', methods=['POST'])
 def post_login():
-    print('logging in', user_name)
     user_name = request.form.get('name')
+    print('logging in', user_name)
     # TODO hash
+    # http://flask.pocoo.org/snippets/54/
     password = request.form.get('password')
 
     user = User.find_one(name=user_name, password=password)
