@@ -1,6 +1,8 @@
 '''i don't even like this real talk'''
 from pymongo import MongoClient
 
+from prosaic.nyarlathotep import process_text
+
 DBNAME = 'prosaicweb'
 
 # TODO lru cache
@@ -47,30 +49,18 @@ class Template(Model):
     col = db().templates
 
 class Source(Model):
-    col = db().phrases
+    col = db().sources
 
-    # TODO kill me
-    @classmethod
-    def find_one(klass, **kwargs):
-        source_name = kwargs.get('name', None)
-        if not source_name:
-            return None
-
-        matching = list(filter(lambda n: source_name == n, klass.list_names()))
-
-        if matching:
-            return {'name': matching[0]}
-
-    @classmethod
-    def list_names(klass):
-        return klass.col.distinct('source')
+    def process(self):
+        phrases_col = db().phrases
+        process_text(self.data['text'], self.data['name'], phrases_col)
 
 class User(Model):
     col = db().users
 
     @property
     def uploads_locked(self):
-        return self.col.find_one(**self.data).get('uplpoads_locked', False)
+        return self.col.find_one(**self.data).get('uploads_locked', False)
 
     def lock_uploads(self):
         self.data['uploads_locked'] = True
@@ -79,5 +69,3 @@ class User(Model):
     def unlock_uploads(self):
         self.data['uploads_locked'] = False
         self.save()
-
-

@@ -116,8 +116,9 @@ def post_upload():
     try:
         user.lock_uploads()
         content = str(request.files.get('upload').read())
-        col = MongoClient().prosaicweb.phrases
-        process_text(content, file_name, col)
+        source = Source({'name':file_name, 'text':content, 'uploader':user_name})
+        source.process()
+        source.save()
     except Exception as e:
         # TODO content type
         return Response(json.dumps({'exception':e.__str__(), 'error': 'parse_exception'}), 400)
