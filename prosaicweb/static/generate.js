@@ -80,11 +80,19 @@ if (!CodeMirror) {
         request.open("POST", "/upload");
         request.send(form_data);
         request.addEventListener('load', successful_upload.bind(null, state));
+
+        state.upload_form.lock();
     };
 
     var successful_upload = function (state, e) {
-        console.log('tea leaves thwart');
-        // TODO need to add entry to the sources list
+        var file_name = JSON.parse(e.target.response).name;
+        console.log(file_name);
+
+        var new_source = document.createElement('option');
+        new_source.textContent = file_name;
+        state.sources.appendChild(new_source);
+        state.upload_form.clear();
+        state.upload_form.unlock();
     };
 
     // init
@@ -94,7 +102,24 @@ if (!CodeMirror) {
         output: qs('#output'),
         preselected_template_option: qs('#templates').selectedOptions[0],
         template_editor: CodeMirror.fromTextArea(qs('textarea'), {mode:'javascript'}),
-        upload_form: qs('#upload')
+        upload_form: qs('#upload'),
+        sources: qs("#sources")
+    };
+
+    NodeList.prototype.forEach = Array.prototype.forEach;
+    state.upload_form.lock = function () {
+        this.querySelectorAll('input').forEach(function (el) {
+            el.setAttribute('disabled', 'true');
+        });
+    };
+    state.upload_form.unlock = function () {
+        this.querySelectorAll('input').forEach(function (el) {
+            el.removeAttribute('disabled');
+        });
+    };
+    state.upload_form.clear = function () {
+        this.querySelector("input[type=text]").value = "";
+        this.querySelector("input[type=file]").value = "";
     };
 
     state.template_select.addEventListener('change', template_selected.bind(null, state));

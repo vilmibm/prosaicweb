@@ -8,12 +8,17 @@
     </head>
     {% if user_name %}
     <form id="logout" action="/logout" method="post">
-        logged in as {{ user_name }} <input type="submit" value="log out">
+        logged in as <b>{{ user_name }}</b> <input type="submit" value="log out">
     </form>
+    {% endif %}
+    <h1>generate some poetry with prosaic</h1>
+    <p>TODO help text</p>
+    {% if user_name %}
     <form id="upload">
-        <p>
-            since yu are logged in yu can upload yr own text files (limit 5mb):
-        </p>
+        <h2>upload new source</h2>
+        <sub>
+            limit 5mb per file. your files are not visible to other users.
+        </sub>
         <p>
             name of file: <input required="true" name="upload_name" type="text">
         </p>
@@ -29,7 +34,7 @@
         <div id="content">
             <div id="col0">
                 <form id="generate">
-                    <h1>sources</h1>
+                    <h2>sources</h2>
                     <p>
                       <select required="true" id="sources" name="source" multiple="true">
                           {% for source in sources %}
@@ -42,7 +47,7 @@
                     <input type="checkbox" name="truncate"><span>truncate longer sources to match shortest source?</span>
                     </p>
 
-                    <h1>template</h1>
+                    <h2>template</h2>
                     <select id="templates" name="template_name">
                         {% for template in templates %}
                         <option value="{{template.name}}" data-content="{{template.json}}"> {{template.name}} </option>
@@ -55,7 +60,7 @@
                 </form>
             </div>
             <div id="col1">
-                <h1>output</h1>
+                <h2>output</h2>
                 <div id="output">
                 </div>
             </div>
