@@ -6,11 +6,15 @@
         <link rel="stylesheet" href="/static/generate.css">
         <link rel="stylesheet" href="/static/codemirror/codemirror.css">
     </head>
+    <div id="authinfo">
     {% if user_name %}
     <form id="logout" action="/logout" method="post">
         logged in as <b>{{ user_name }}</b> <input type="submit" value="log out">
     </form>
+    {% else %}
+    <sub><b>hello anonymous user</b>, feel free to play with this tool! if you <a href="/auth">authenticate</a>, you can upload your own source texts to cut up.</sub>
     {% endif %}
+    </div>
     <h1>generate some poetry with prosaic</h1>
     <p>TODO help text</p>
     {% if user_name %}

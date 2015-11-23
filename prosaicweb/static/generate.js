@@ -71,30 +71,6 @@ if (!CodeMirror) {
         request.addEventListener('load', successful_generation.bind(null, state));
     };
 
-    var upload_file = function (state, e) {
-        e.preventDefault();
-
-        var form_data = new FormData(state.upload_form);
-        var request = new XMLHttpRequest();
-
-        request.open("POST", "/upload");
-        request.send(form_data);
-        request.addEventListener('load', successful_upload.bind(null, state));
-
-        state.upload_form.lock();
-    };
-
-    var successful_upload = function (state, e) {
-        var file_name = JSON.parse(e.target.response).name;
-        console.log(file_name);
-
-        var new_source = document.createElement('option');
-        new_source.textContent = file_name;
-        state.sources.appendChild(new_source);
-        state.upload_form.clear();
-        state.upload_form.unlock();
-    };
-
     // init
     var state = {
         template_select: qs('#templates'),
@@ -107,23 +83,49 @@ if (!CodeMirror) {
     };
 
     NodeList.prototype.forEach = Array.prototype.forEach;
-    state.upload_form.lock = function () {
-        this.querySelectorAll('input').forEach(function (el) {
-            el.setAttribute('disabled', 'true');
-        });
-    };
-    state.upload_form.unlock = function () {
-        this.querySelectorAll('input').forEach(function (el) {
-            el.removeAttribute('disabled');
-        });
-    };
-    state.upload_form.clear = function () {
-        this.querySelector("input[type=text]").value = "";
-        this.querySelector("input[type=file]").value = "";
-    };
-
     state.template_select.addEventListener('change', template_selected.bind(null, state));
     state.generate_form.addEventListener('submit', submit_generation.bind(null, state), true);
     state.template_editor.setValue(JSON.pretty_print(state.preselected_template_option.dataset.content));
-    state.upload_form.addEventListener('submit', upload_file.bind(null, state));
+
+    if (state.upload_form) {
+        var successful_upload = function (state, e) {
+            var file_name = JSON.parse(e.target.response).name;
+
+            var new_source = document.createElement('option');
+            new_source.textContent = file_name;
+            state.sources.appendChild(new_source);
+            state.upload_form.clear();
+            state.upload_form.unlock();
+        };
+
+        var upload_file = function (state, e) {
+            e.preventDefault();
+
+            var form_data = new FormData(state.upload_form);
+            var request = new XMLHttpRequest();
+
+            request.open("POST", "/upload");
+            request.send(form_data);
+            request.addEventListener('load', successful_upload.bind(null, state));
+
+            state.upload_form.lock();
+        };
+
+        state.upload_form.lock = function () {
+            this.querySelectorAll('input').forEach(function (el) {
+                el.setAttribute('disabled', 'true');
+            });
+        };
+        state.upload_form.unlock = function () {
+            this.querySelectorAll('input').forEach(function (el) {
+                el.removeAttribute('disabled');
+            });
+        };
+        state.upload_form.clear = function () {
+            this.querySelector("input[type=text]").value = "";
+            this.querySelector("input[type=file]").value = "";
+        };
+
+        state.upload_form.addEventListener('submit', upload_file.bind(null, state));
+    }
 })();
