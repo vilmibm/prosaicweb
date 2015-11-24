@@ -1,0 +1,86 @@
+from os import path
+
+import cfg
+from models import Template, User, Source
+
+templates = [
+    {'name':'sonnet',
+     'lines': [
+         {'rhyme':'A', 'syllables': 10},
+         {'rhyme':'B', 'syllables': 12},
+         {'rhyme':'A', 'syllables': 11},
+         {'rhyme':'B', 'syllables': 13},
+         {'blank': True},
+         {'rhyme':'C', 'syllables': 10},
+         {'rhyme':'D', 'syllables': 12},
+         {'rhyme':'C', 'syllables': 11},
+         {'rhyme':'D', 'syllables': 13},
+         {'blank': True},
+         {'rhyme':'E', 'syllables': 10},
+         {'rhyme':'F', 'syllables': 12},
+         {'rhyme':'E', 'syllables': 11},
+         {'rhyme':'F', 'syllables': 13},
+         {'blank':True},
+         {'rhyme':'G', 'syllables': 12},
+         {'rhyme':'G', 'syllables': 10},]},
+
+    {'name': 'haiku',
+     'lines': [
+         {'syllables': 5},
+         {'syllables': 7},
+         {'syllables': 5},]},
+
+    {'name':'morbid',
+     'lines': [
+         {'keyword':'dying'},
+         {'fuzzy': 'death'},
+         {'keyword': 'dark'},
+         {'fuzzy': 'pitch'},
+         {'blank': True},
+         {'keyword': 'dying'},
+         {'keyword': 'end'}
+     ]}
+]
+
+source_filenames = ['paradise_lost.txt',
+                    'call_of_cthulhu.txt',
+                    'odyssey_into_prose.txt',
+                    'leaves_of_grass.txt',
+                    'hanging_stranger.txt',
+                    'metamorphosis.txt',
+                    'doom_that_came_to_sarnath.txt',
+                    'dream_quest_of_unknown_kadath.txt',
+                    'pride_and_prejudice.txt',
+                    'jane_eyre.txt',
+                    'sea_garden.txt',
+                    'the_waste_land.txt',
+                    'the_raven.txt',
+                    'fall_of_the_house_of_usher.txt',
+                    'the_colors_of_space.txt',
+                    'frankenstein.txt',
+                    'the_last_man.txt']
+
+def install():
+    print("installing templates...")
+    for template_data in templates:
+        print("\t{}".format(template_data['name']))
+        t = Template(data)
+        t.save()
+
+    print("installing source texts...")
+    for source_filename in source_filenames:
+        source_path = path.join(path.dirname(__file__), 'txt', source_filename)
+        print("\treading {}".format(source_path))
+        text = open(source_path).read()
+        s = Source({'name':source_filename,
+                    'text':text,
+                    'uploader': cfg.SYSTEM_USER})
+        print("\tprocessing {}".format(source_path))
+        s.process()
+        print("\tsaving {}".format(source_path))
+        s.save()
+
+    print('adding system user')
+    u = User({'name':cfg.SYSTEM_USER,
+              'password': ''})
+    u.save()
