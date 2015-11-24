@@ -14,6 +14,7 @@ from models import Template, Source, User
 
 SITE_NAME = 'prosaicweb'
 DEFAULT_CONFIG = './prosaicweb.conf'
+SYSTEM_USER = 'system'
 
 app = Flask('prosaicweb')
 
@@ -39,11 +40,18 @@ def col_copy(src, dest):
 @app.route('/', methods=['GET'])
 def get_generate():
     user_name = request.cookies.get('user_name')
+    sources = Source.find(uploader=user_name)
+    if SYSTEM_USER != user_name:
+        sources.extend(Source.find(uploader=SYSTEM_USER))
+    sources = list(map(lambda s: {'system': s['uploader'] == SYSTEM_USER,
+                                  'name': s['name']},
+                       sources))
+    sources.sort(key=lambda s:s['name'])
     templates = [{'name': t['name'],
                   'json': json.dumps(t['lines'])}
                  for t in Template.list()]
     context = {'templates': templates,
-               'sources': Source.list_names(),
+               'sources': sources,
                'user_name': user_name}
     return render_template('generate.html', **context)
 

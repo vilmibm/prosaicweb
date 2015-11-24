@@ -53,3 +53,7 @@ textarea {
     padding:1em;
     width:50%;
 }
+
+.system.source {
+    background-color: rgba(255, 27, 0, 0.3);
+}

@@ -40,9 +40,18 @@
                 <form id="generate">
                     <h2>sources</h2>
                     <p>
+                        <span class="system source">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>: default source
+                    </p>
+                    <p>
                       <select required="true" id="sources" name="source" multiple="true">
                           {% for source in sources %}
-                          <option>{{source}}</option>
+                          <option {% if source.system %}
+                                  class="system source"
+                                  {% else %}
+                                  class="user source"
+                                  {% endif %}>
+                              {{source.name}}
+                          </option>
                           {% endfor %}
                       </select>
 
