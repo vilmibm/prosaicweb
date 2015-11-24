@@ -19,7 +19,12 @@ body {
 #sources {
     width: 60%;
     height: 10em;
+    font-size:120%;
 }
+
+  #sources option {
+      padding:.5em;
+  }
 
 textarea {
     width: 100%;
