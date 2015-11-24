@@ -1,27 +1,18 @@
 import json
 import random
-from functools import lru_cache
 
 from flask import Flask, render_template, request, redirect, jsonify, Response
-from pyhocon import ConfigFactory
 from prosaic.cthulhu import poem_from_template
-from prosaic.nyarlathotep import process_text
-from pymongo import MongoClient
 
-# TODO https://github.com/zeekay/flask-uwsgi-websocket
-
+import cfg
 from models import Template, Source, User
+import storage
 
-SITE_NAME = 'prosaicweb'
-DEFAULT_CONFIG = './prosaicweb.conf'
-SYSTEM_USER = 'system'
+app = Flask(cfg.SITE_NAME)
 
-app = Flask('prosaicweb')
-
-config = ConfigFactory.parse_file(DEFAULT_CONFIG)
-app.config['DEBUG'] = True
-app.config['SECRET_KEY'] = 'TESTING LOL'
-app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024 # 5mb
+app.config['DEBUG'] = cfg.DEBUG
+app.config['SECRET_KEY'] = cfg.SECRET_KEY
+app.config['MAX_CONTENT_LENGTH'] = cfg.MAX_UPLOAD_SIZE
 
 def collection_name(sources, truncate):
     """TODO"""
@@ -41,9 +32,9 @@ def col_copy(src, dest):
 def get_generate():
     user_name = request.cookies.get('user_name')
     sources = Source.find(uploader=user_name)
-    if SYSTEM_USER != user_name:
-        sources.extend(Source.find(uploader=SYSTEM_USER))
-    sources = list(map(lambda s: {'system': s['uploader'] == SYSTEM_USER,
+    if cfg.SYSTEM_USER != user_name:
+        sources.extend(Source.find(uploader=cfg.SYSTEM_USER))
+    sources = list(map(lambda s: {'system': s['uploader'] == cfg.SYSTEM_USER,
                                   'name': s['name']},
                        sources))
     sources.sort(key=lambda s:s['name'])
@@ -61,7 +52,7 @@ def post_generate():
     sources = request.form.getlist('source')
     combined_col_name = collection_name(sources, truncate)
 
-    db = MongoClient().prosaicweb
+    db = storage.db()
     col = db[combined_col_name]
 
     if col.count() == 0:
@@ -173,6 +164,9 @@ def post_login():
     # TODO hash
     # http://flask.pocoo.org/snippets/54/
     password = request.form.get('password')
+
+    if not (user_name and password):
+        return render_template('auth.html', login_msg="dunno yu sorry")
 
     user = User.find_one(name=user_name, password=password)
 

@@ -1,17 +1,7 @@
 '''i don't even like this real talk'''
-from pymongo import MongoClient
-
 from prosaic.nyarlathotep import process_text
 
-DBNAME = 'prosaicweb'
-
-# TODO lru cache
-# ideally these would be static class things inside Model:
-def client():
-    return MongoClient()
-
-def db():
-    return client()[DBNAME]
+from storage import db
 
 class Model:
     col = None # Override in subclasses
@@ -33,7 +23,6 @@ class Model:
 
     @classmethod
     def find_one(klass, **kwargs):
-        # TODO mongo find_one?
         found = klass.find(**kwargs)
         if len(found) > 0:
             return found[0]
