@@ -4,8 +4,8 @@ _being a web frontend to [prosaic](https://github.com/nathanielksmith/prosaic)_.
 
 ## requirements
 
-python 3.4
-mongodb installed and running
+* python >= 3.4
+* mongodb installed and running
 
 ## installation / deploy
 
