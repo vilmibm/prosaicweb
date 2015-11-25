@@ -64,12 +64,12 @@ def install():
     print("installing templates...")
     for template_data in templates:
         print("\t{}".format(template_data['name']))
-        t = Template(data)
+        t = Template(template_data)
         t.save()
 
     print("installing source texts...")
     for source_filename in source_filenames:
-        source_path = path.join(path.dirname(__file__), 'txt', source_filename)
+        source_path = path.join(path.dirname(__file__), 'static/txt', source_filename)
         print("\treading {}".format(source_path))
         text = open(source_path).read()
         s = Source({'name':source_filename,
