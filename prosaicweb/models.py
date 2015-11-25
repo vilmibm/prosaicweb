@@ -1,5 +1,6 @@
 '''i don't even like this real talk'''
 from prosaic.nyarlathotep import process_text
+from werkzeug.security import generate_password_hash, check_password_hash
 
 from storage import db
 
@@ -47,9 +48,21 @@ class Source(Model):
 class User(Model):
     col = db().users
 
+    def __init__(self, data):
+        password = data.get('password')
+        if password:
+            data['password'] = generate_password_hash(password)
+        self.data = data
+
     @property
     def uploads_locked(self):
-        return self.col.find_one(**self.data).get('uploads_locked', False)
+        return self.col.find_one(name=self.data['name']).get('uploads_locked', False)
+
+    def check_password(self, attempt):
+        """Given a password attempt, check the hashed/salted pw and return
+        boolean"""
+        data = self.find_one(name=self.data['name'])
+        return check_password_hash(data['password'], attempt)
 
     def lock_uploads(self):
         self.data['uploads_locked'] = True

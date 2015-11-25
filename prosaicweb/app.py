@@ -143,8 +143,8 @@ def post_register():
         print('captcha failed, erroring')
         context['login_msg'] = 'oops, are you human?'
     else:
-        user = User.find_one(name=user_name)
-        if user is None:
+        user_data = User.find_one(name=user_name)
+        if user_data is None:
             print('user not found, creating')
             user = User({'name': user_name,
                          'password': password})
@@ -161,16 +161,14 @@ def post_register():
 def post_login():
     user_name = request.form.get('name')
     print('logging in', user_name)
-    # TODO hash
-    # http://flask.pocoo.org/snippets/54/
     password = request.form.get('password')
 
     if not (user_name and password):
         return render_template('auth.html', login_msg="dunno yu sorry")
 
-    user = User.find_one(name=user_name, password=password)
+    user = User(User.find_one(name=user_name))
 
-    if user:
+    if user.check_password(password):
         print('found user, logging in')
         response = redirect('/')
         response.set_cookie('user_name', user_name)
