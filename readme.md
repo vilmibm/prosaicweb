@@ -2,37 +2,40 @@
 
 _being a web frontend to [prosaic](https://github.com/nathanielksmith/prosaic)_.
 
-# design
+## requirements
 
-## mvp
+python 3.4
+mongodb installed and running
 
-* visiting the site creates a session for you
-* can only have one queued upload per session
-* can only have one queued poetry generation per session
-* saves generated poetry for 7 days (can be deleted sooner)
-* editor for templates (basic textarea is fine)
+## installation / deploy
 
-## future
+    # clone repo
+    git clone https://github.com/nathanielksmith/prosaicweb
+    cd prosaicweb/prosaicweb
 
-* richer editor for syntax
-* ability to pin lines in generated poem, keep generating
+    # set up virtualenv
+    virtualenv prosaicwebvenv -p $(which python3)
+    source prosaicwebvenv/bin/activate
+    pip install -r ../requirements.txt
 
-# architecture
+    # configure
+    cp example.cfg.py cfg.py
+    # edit cfg.py and set the secret key
 
-* some kind of job queue (mongodb+celery? or redis+celery?)
-* flask webapp
-* gunicorn server
-* mongodb; easier just because it has to exist for prosaic
+    # install initial text sources
+    python -c 'from fixtures import install; install()'
 
-# urls
+    # run. should prob reverse proxy.
+    gunicorn app:app -D -b 0.0.0.0:8000
 
-## mvp
+## changelog
 
-* /: landing page. links for "upload corpus" or "generate poetry"
-* /upload: upload text file, paste text. use/create session. label with "file name", description
-* /generate: pick corpora, generate poem. use/create session.
+* 0.0.1 - initial release. user accounts, upload, template editing, corpus mixing.
 
-## future
+## author
 
-* /poetry: all generated poems
-* /corpora: all corpora, listed with details
+vilmibm <nathanielksmith@gmail.com>
+
+## license
+
+AGPL v3
