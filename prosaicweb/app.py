@@ -57,6 +57,7 @@ def get_generate():
                   'json': json.dumps(t['lines'])}
                  for t in Template.list()]
     context = {'templates': templates,
+               'site_name': cfg.SITE_NAME,
                'sources': sources,
                'user_name': user_name}
     return render_template('generate.html', **context)
@@ -143,7 +144,7 @@ def post_upload():
 
 @app.route('/auth', methods=['GET'])
 def get_auth():
-    return render_template('auth.html')
+    return render_template('auth.html', site_name=cfg.SITE_NAME)
 
 @app.route('/register', methods=['POST'])
 def post_register():

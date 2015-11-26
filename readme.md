@@ -6,6 +6,8 @@ _being a web frontend to [prosaic](https://github.com/nathanielksmith/prosaic)_.
 
 * python >= 3.4
 * mongodb installed and running
+* gcc (for python deps)
+* (optional) nginx for reverse proxying to gunicorn
 
 ## installation / deploy
 
@@ -30,6 +32,7 @@ _being a web frontend to [prosaic](https://github.com/nathanielksmith/prosaic)_.
 
 ## changelog
 
+* 0.0.2 - make it work on webkit, support site_name
 * 0.0.1 - initial release. user accounts, upload, template editing, corpus mixing.
 
 ## author

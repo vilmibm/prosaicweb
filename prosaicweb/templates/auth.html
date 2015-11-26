@@ -21,7 +21,7 @@
         <title>register or login</title>
     </head>
     <body>
-        <h1>login</h1>
+        <h1>login to {{ site_name }}</h1>
         <span class="msg">{{ login_msg }}</span>
         <form method="post" action="/login">
             <p>
@@ -33,7 +33,7 @@
             <input type="submit" value="log in">
         </form>
 
-        <h1>register</h1>
+        <h1>register a new account on {{site_name}}</h1>
         <span class="msg">{{ register_msg }}</span>
         <form method="post" action="/register">
             <p>

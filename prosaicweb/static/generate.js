@@ -17,7 +17,13 @@ if (!CodeMirror) {
 
     // events
     var template_selected = function (state, e) {
-        var option = e.explicitOriginalTarget;
+        var option;
+        if (e.explicitOriginalTarget) { // mozilla only
+            option = e.explicitOriginalTarget;
+        }
+        else {
+            option = qs("option[value=" + e.target.value + "]");
+        }
         state.template_editor.setValue(JSON.pretty_print(option.dataset.content));
     };
 
