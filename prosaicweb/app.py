@@ -182,7 +182,10 @@ def post_login():
     if not (user_name and password):
         return render_template('auth.html', login_msg="dunno yu sorry")
 
-    user = User(User.find_one(name=user_name))
+    user_data = User.find_one(name=user_name)
+    if not user_data:
+        return render_template('auth.html', login_msg="dunno yu sorry")
+    user = User(user_data)
 
     if user.check_password(password):
         print('found user, logging in')
