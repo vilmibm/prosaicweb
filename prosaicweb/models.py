@@ -13,76 +13,89 @@
 #
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-'''i don't even like this real talk'''
-from prosaic.nyarlathotep import process_text
+from functools import lru_cache
+
+from prosaic.models import Base, Source, Corpus
+from prosaic.parsing import process_text
+from sqlalchemy import create_engine, Column, Boolean, ForeignKey, Table
+from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy.engine import Engine
+from sqlalchemy.dialects.postgresql import ARRAY, TEXT, INTEGER
+from sqlalchemy.ext.declarative import declarative_base
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from storage import db
+class Database(dict):
+    def __init__(self, user='prosaic', password='prosaic', host='localhost',
+                 port=5432, dbname='prosaic'):
+        self._data = dict(user=user, password=password, port=port,
+                          host=host, dbname=dbname)
 
-class Model:
-    col = None # Override in subclasses
+    def __getattr__(self, k: str) -> str:
+        return self[k]
 
-    @classmethod
-    def list_names(klass):
-        """list of the names of all things of this type"""
-        things = klass.list()
-        return list(map(lambda t: t['name'], things))
+    def __getitem__(self, k: str) -> str:
+        return self._data[k]
 
-    @classmethod
-    def list(klass):
-        """list all of models of this type"""
-        return list(klass.col.find({}))
+    def _fmt(self) -> str:
+        return ';'.join(sorted(map(str, self._data.values())))
 
-    @classmethod
-    def find(klass, **kwargs):
-        return list(klass.col.find(kwargs))
+    def __hash__(self) -> int:
+        return hash(self._fmt())
 
-    @classmethod
-    def find_one(klass, **kwargs):
-        found = klass.find(**kwargs)
-        if len(found) > 0:
-            return found[0]
-        return None
+    def __repr__(self) -> str:
+        return self._fmt()
 
-    def __init__(self, data):
-        self.data = data
+DEFAULT_DB = Database(**{'user': 'prosaic',
+                  'password': 'prosaic',
+                  'host': '127.0.0.1',
+                  'port': 5432,
+                  'dbname': 'prosaic'})
 
-    def save(self):
-        self.col.update({'name':self.data['name']}, self.data, True)
+@lru_cache(maxsize=128)
+def get_engine(db: Database) -> Engine:
+    return create_engine('postgresql://{user}:{password}@{host}:{port}/{dbname}'\
+           .format(**db))
 
-class Template(Model):
-    col = db().templates
+Session = sessionmaker()
 
-class Source(Model):
-    col = db().sources
+def get_session(db: Database):
+    Session.configure(bind=get_engine(db))
+    return Session()
 
-    def process(self):
-        phrases_col = db().phrases
-        process_text(self.data['text'], self.data['name'], phrases_col)
+# TODO do I need to re-use prosaic.models.Base?
+#Base = declarative_base()
 
-class User(Model):
-    col = db().users
+users_sources = Table('users_sources', Base.metadata,
+                    Column('user_id', INTEGER, ForeignKey('users.id')),
+                    Column('source_id', INTEGER, ForeignKey('sources.id')))
 
-    def __init__(self, data):
-        password = data.get('password')
-        if password:
-            data['password'] = generate_password_hash(password)
-        self.data = data
+users_corpora = Table('users_corpora', Base.metadata,
+                    Column('user_id', INTEGER, ForeignKey('users.id')),
+                    Column('corpus_id', INTEGER, ForeignKey('corpora.id')))
 
-    @property
-    def uploads_locked(self):
-        return self.col.find_one(name=self.data['name']).get('uploads_locked', False)
+users_templates = Table('users_templates', Base.metadata,
+                    Column('user_id', INTEGER, ForeignKey('users.id')),
+                    Column('template_id', INTEGER, ForeignKey('templates.id')))
 
-    def check_password(self, attempt):
-        """Given a password attempt, check the hashed/salted pw and return
-        boolean"""
-        data = self.find_one(name=self.data['name'])
-        return check_password_hash(data['password'], attempt)
+class Template(Base):
+    __tablename__ = 'templates'
 
-    def lock_uploads(self):
-        self.data['uploads_locked'] = True
-        self.save()
+    id = Column(INTEGER, primary_key=True)
+    # TODO
 
-    def unlock_uploads(self):
-        self.data['uploads_locked'] = False
-        self.save()
+class User(Base):
+    __tablename__ = 'users'
+
+    id = Column(INTEGER, primary_key=True)
+    username = Column(TEXT)
+    pwhash = Column(TEXT)
+    email = Column(TEXT)
+
+    sources = relationship('Source', secondary=users_sources)
+    corpora = relationship('Corpus', secondary=users_corpora)
+    templates = relationship('Template', secondary=users_templates)
+
+    def __repr__(self) -> str:
+        return "User(username='{}', email='{}', pwhash='{}')".format(
+            self.username, self.email, self.pwhash)
+
