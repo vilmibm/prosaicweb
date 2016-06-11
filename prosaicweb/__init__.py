@@ -1,5 +1,5 @@
 # prosaicweb
-# Copyright (C) 2015  nathaniel smith
+# Copyright (C) 2016  nathaniel smith
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by

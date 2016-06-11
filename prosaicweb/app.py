@@ -1,5 +1,5 @@
 # prosaicweb
-# Copyright (C) 2015  nathaniel smith
+# Copyright (C) 2016  nathaniel smith
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -22,13 +22,105 @@ from prosaic.generation import poem_from_template
 from .cfg import SITE_NAME, DEBUG, SECRET_KEY, MAX_UPLOAD_SIZE
 from .models import Template, Source, User
 from .storage import get_db
+import .views as views
 
-app = Flask(SITE_NAME)
+# TODO import route functions
+# TODO register each with add_url_rule
+
+"""
+for views, considering:
+    views/__init__.py # default place for views
+    views/auth.py     # login/logout/account stuff
+
+alternatives:
+    * stick everything into views.py (maybe)
+    * put everything here in app.py (no)
+
+I want this file to be a high level look into the app's topography.
+
+for templates:
+    templates/base.html # has auth stuff linked
+    templates/corpora.html
+    templates/sources.html
+    templates/templates.html
+    templates/generate.html
+    templates/account.html # edit account info
+
+notes:
+    * can add new templates from generate page
+    * can add new sources to a (new) corpora from generate page
+
+# the generate flow
+
+The ingredients of poetry generation:
+
+    * choosing a corpora
+    * choosing a template
+    * refining the output
+
+The first two will be confined to the left pane, the final to a right pane.
+
+The base html of the site will have this row at the top:
+
+    | generate | sources | corpora | templates | generate | ... | account
+
+where ... expands to fill available space. each link loads the governing template, which will 
+inevitably contain forms that POST etc to edit/add/delete things.
+
+
+routes:
+
+    (PUT: update, POST: new)
+
+    * GET / - static information page
+
+    * GET /generate
+    * POST /generate
+
+    * GET /corpora
+    * POST /corpora
+    * PUT /corpora
+    * DELETE /corpora
+
+    * GET /sources
+    * POST /sources
+    * DELETE /sources
+    * PUT /sources
+
+    * GET /templates
+    * POST /templates
+    * DELETE /templates
+    * PUT /templates
+
+    * GET /auth/account    - account info page
+    * POST /auth/account   - create new accoutn
+    * PUT /auth/account    - update account
+    * DELETE /auth/account - delete account
+    * POST /auth/session   - login
+    * DELETE /auth/session - logout
+
+"""
+
+SYSTEM_USER = 'sigh' # TODO no
+app = Flask('prosaicweb')
 
 app.config['DEBUG'] = DEBUG
 app.config['SECRET_KEY'] = SECRET_KEY
 app.config['MAX_CONTENT_LENGTH'] = MAX_UPLOAD_SIZE
-SYSTEM_USER = 'sigh'
+
+routes = [
+    ('/', 'index' views.index, {}),
+    ('/generate', 'generate', views.generate, {'methods': ['GET', 'POST']}),
+    ('/corpora', 'corpora', views.corpora, {'methods': ['GET', 'POST', 'DELETE', 'PUT']}),
+    ('/sources', 'sources', views.sources, {'methods'; ['GET', 'POST', 'DELETE', 'PUT']}),
+    ('/templates', 'templates', views.templates, {'methods'; ['GET', 'POST', 'DELETE', 'PUT']}),
+    ('/auth/account', 'account', views.auth.account,
+     {'methods'; ['GET', 'POST', 'DELETE', 'PUT']}),
+    ('/auth/session', 'session', views.auth.session, {'methods': ['POST', 'DELETE']}),
+]
+
+for [route, name, fn, opts] in routes:
+    app.add_url_rule(route, name, fn, **opts)
 
 def collection_name(sources, truncate):
     """TODO"""
@@ -44,7 +136,6 @@ def col_copy(src, dest):
         item.pop('_id')
         dest.insert(item)
 
-@app.route('/', methods=['GET'])
 def get_generate():
     user_name = request.cookies.get('user_name')
     sources = Source.find(uploader=user_name)
@@ -63,7 +154,6 @@ def get_generate():
                'user_name': user_name}
     return render_template('generate.html', **context)
 
-@app.route('/generate', methods=['POST'])
 def post_generate():
     truncate = request.form.get('truncate', None)
     sources = request.form.getlist('source')
@@ -107,7 +197,6 @@ def post_generate():
 
     return jsonify(lines=list(raw_lines), used_sources=list(used_sources))
 
-@app.route('/upload', methods=['POST'])
 def post_upload():
     user_name = request.cookies.get('user_name')
     user = User(User.find_one(name=user_name))
@@ -143,11 +232,9 @@ def post_upload():
 
     return Response(json.dumps({'name':file_name}))
 
-@app.route('/auth', methods=['GET'])
 def get_auth():
     return render_template('auth.html', site_name=SITE_NAME)
 
-@app.route('/register', methods=['POST'])
 def post_register():
 
     user_name = request.form.get('name')
@@ -174,7 +261,6 @@ def post_register():
     # TODO should do a redirect but lol
     return render_template('auth.html', **context)
 
-@app.route('/login', methods=['POST'])
 def post_login():
     user_name = request.form.get('name')
     print('logging in', user_name)
@@ -197,7 +283,6 @@ def post_login():
         print('did not find user, erroring')
         return render_template('auth.html', login_msg="dunno yu sorry")
 
-@app.route('/logout', methods=['POST', 'GET'])
 def post_logout():
     print('logging out user', request.cookies.get('user_name'))
     response = redirect('/')
