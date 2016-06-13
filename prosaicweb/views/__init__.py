@@ -14,8 +14,33 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-def index(): pass
-def corpora(): pass
+from flask import render_template, request
+# TODO don't use DEFAULT_DB
+from ..models import Corpus, get_session, DEFAULT_DB
+
+# TODO types?
+
+def index():
+    return "main page lulz"
+
+def corpora(): 
+    # TODO block on auth
+    if request.method == 'GET':
+        context = {'corpora':[],
+                   # 'authenticated': False, }
+                   'authenticated': True,
+                   'username': 'vilmibm'}
+        return render_template('corpora.html', **context)
+
+    if request.method == 'POST':
+        return "TODO"
+
+    if request.method == 'PUT':
+        return "TODO"
+
+    if request.method == 'DELETE':
+        return "TODO"
+
 def sources(): pass
 def templates(): pass
 def generate(): pass

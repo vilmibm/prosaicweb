@@ -62,9 +62,6 @@ def get_session(db: Database):
     Session.configure(bind=get_engine(db))
     return Session()
 
-# TODO do I need to re-use prosaic.models.Base?
-#Base = declarative_base()
-
 users_sources = Table('users_sources', Base.metadata,
                     Column('user_id', INTEGER, ForeignKey('users.id')),
                     Column('source_id', INTEGER, ForeignKey('sources.id')))

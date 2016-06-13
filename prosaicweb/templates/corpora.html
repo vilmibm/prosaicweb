@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>corpora - prosaicweb</title>
+{% endblock %}
+
+{% block content %}
+<h1>corpora</h1>
+
+<h2>add a new corpus</h2>
+<form method="POST" action="/corpora">
+    <label>name <input name="corpus_name"/></label>
+    <label>description <input name="corpus_description"/></label>
+    <button>submit</button>
+</form>
+
+<h2>existing corpora</h2>
+<table>
+    <tr>
+        <th>name</th> <th>description</th> <th>sources</th>
+    </tr>
+    {% for corpus in corpora %}
+    <tr>
+        <td>{{ corpus.name }}</td>
+        <td>{{ corpus.description }}</td>
+        <td>
+        {% for source in corpus.sources %}
+            <a href="/sources#{{ source.name }}">source.name</a>%nbsp;
+        {% endfor %}
+        </td>
+        <td>
+            <form method="DELETE" action="/sources">
+                <input type="hidden" name="corpus_id" value="{{ corpus.id }}">
+                <button>delete</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

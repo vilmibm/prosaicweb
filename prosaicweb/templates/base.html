@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html charset="utf-8">
+    <head>
+        <link rel="stylesheet" href="/static/main.css">
+        {% block head %}
+        <title>prosaic web</title>
+        {% endblock %}
+      </head>
+      <body>
+          <div id="top">
+              <span class="tab left"><a href="/generate">generate</a></span>
+              <span class="tab left"><a href="/corpora">corpora</a></span>
+              <span class="tab left"><a href="/sources">sources</a></span>
+              <span class="tab left"><a href="/templates">templates</a></span>
+
+              <span class="tab right">
+                  {% if authenticated %}
+                  logged in as <a href="/auth/account">{{ username }}</a>
+                  | <button formaction="/auth/session" formmethod="DELETE">log out</button>
+                  {% else %}
+                  <form action="/auth/session" method="POST">
+                      <input type="email" name="email" placeholder="email">
+                      <input type="password" name="password" placeholder="password">
+                      <button>login</button>
+                  </form>
+                  | <a href="/auth/account/create">create an account</a>
+                  {% endif %}
+              </span>
+          </div>
+          {% if authenticated %}
+          {% block content %}{% endblock %}
+          {% else %}
+          please login :)
+          {% endif %}
+      </body>
+</html>
