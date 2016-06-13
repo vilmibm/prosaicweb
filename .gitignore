@@ -1,4 +1,4 @@
 *.egg-info
-prosaicweb/__pycache__
+__pycache__
 prosaicweb/cfg.py
 *.swp
