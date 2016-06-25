@@ -46,8 +46,14 @@ def corpus(corpus_id):
     if request.method == 'GET':
         session = get_session(DEFAULT_DB)
         c = session.query(Corpus).filter(Corpus.id == corpus_id).one()
+        source_ids = map(lambda s: s.id, c.sources)
+
+        other_sources = session.query(Source)\
+                        .filter(Source.id.notin_(source_ids))\
+                        .all()
         context = {
             'corpus': c,
+            'other_sources': other_sources,
             'authenticated':True,
             'username':'vilmibm',
         }
@@ -55,6 +61,7 @@ def corpus(corpus_id):
 
     # srsly not rest at all. this is an update
     if request.method == 'POST':
+        # TODO should I re-use this for creation? could None-ize corpus_id...
         session = get_session(DEFAULT_DB)
         c = session.query(Corpus).filter(Corpus.id == corpus_id).one()
         c.name = request.form['corpus_name']

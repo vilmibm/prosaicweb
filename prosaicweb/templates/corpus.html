@@ -29,6 +29,14 @@
             </label>
         </li>
         {% endfor %}
+        {% for source in other_sources %}
+        <li>
+            <label>
+                <input type="checkbox" name="sources" value="{{source.id}}">
+                {{source.name}}
+            </label>
+        </li>
+        {% endfor %}
         </ul>
     </fieldset>
     <button>update</button>
