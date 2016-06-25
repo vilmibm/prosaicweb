@@ -38,6 +38,32 @@ def corpora():
                    'username': 'vilmibm'}
         return render_template('corpora.html', **context)
 
+    if request.method == 'POST':
+        # TODO create new corpus
+        return ''
+
+def corpus(corpus_id):
+    if request.method == 'GET':
+        session = get_session(DEFAULT_DB)
+        c = session.query(Corpus).filter(Corpus.id == corpus_id).one()
+        context = {
+            'corpus': c,
+            'authenticated':True,
+            'username':'vilmibm',
+        }
+        return render_template('corpus.html', **context)
+
+    # srsly not rest at all. this is an update
+    if request.method == 'POST':
+        session = get_session(DEFAULT_DB)
+        c = session.query(Corpus).filter(Corpus.id == corpus_id).one()
+        c.name = request.form['corpus_name']
+        c.description = request.form['corpus_description']
+        source_ids = map(int, request.form.getlist('sources'))
+        c.sources = session.query(Source).filter(Source.id.in_(source_ids)).all()
+        session.commit()
+        return redirect('/corpora')
+
 def sources():
     # TODO block on auth
     if request.method == 'GET':
@@ -49,6 +75,11 @@ def sources():
                    'authenticated':True,
                    'username': 'vilmibm'}
         return render_template('sources.html', **context)
+
+    if request.method == 'POST':
+        # TODO create new source from form
+        return ''
+
 
 def source(source_id):
     if request.method == 'GET':

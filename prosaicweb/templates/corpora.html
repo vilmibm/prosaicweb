@@ -21,20 +21,13 @@
     </tr>
     {% for corpus in corpora %}
     <tr>
-        <td>{{ corpus.name }}</td>
+        <td><a href="/corpora/{{corpus.id}}">{{ corpus.name }}</a></td>
         <td>{{ corpus.description }}</td>
         <td>
         {% for source in corpus.sources %}
         {# TODO want a url_for_source that can take a source #}
         <a href="/sources#{{ source.name }}">{{source.name}}</a>&nbsp;
         {% endfor %}
-        </td>
-        <td>
-            <a href="/edit/{{corpus.name}}">edit</a>
-            <form method="DELETE" action="/sources">
-                <input type="hidden" name="corpus_id" value="{{ corpus.id }}">
-                <button>delete</button>
-            </form>
         </td>
     </tr>
     {% endfor %}

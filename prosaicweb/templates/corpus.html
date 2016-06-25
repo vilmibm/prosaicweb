@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>{{corpus.name}} - prosaicweb</title>
+{% endblock %}
+
+{% block content %}
+<h1>{{corpus.name}}</h2>
+{# this isn't going to work lol #}
+<form method="DELETE" action="/corpora/{{corpus.id}}">
+    <input type="hidden" name="corpus_id" value="{{corpus.id}}">
+    <button>delete this corpus</button><br>
+    <sub>note, deleting a corpus does not delete any associated sources</sub>
+</form>
+<form method="post" action="/corpora/{{corpus.id}}">
+    <fieldset>
+        <legend>meta</legend>
+        <label>name <input name="corpus_name" value="{{corpus.name}}"></label><br>
+        <label>description <textarea name="corpus_description">{{corpus.description}}</textarea></label>
+    </fieldset>
+    <fieldset>
+        <legend>sources</legend>
+        <ul>
+        {% for source in corpus.sources %}
+        <li>
+            <label>
+                <input type="checkbox" name="sources" checked="true" value="{{source.id}}">
+                {{source.name}}
+            </label>
+        </li>
+        {% endfor %}
+        </ul>
+    </fieldset>
+    <button>update</button>
+</form>
+{% endblock %}

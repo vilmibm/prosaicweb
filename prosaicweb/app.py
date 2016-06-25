@@ -22,7 +22,7 @@ from prosaic.generation import poem_from_template
 from .cfg import SITE_NAME, DEBUG, SECRET_KEY, MAX_UPLOAD_SIZE
 from .models import Template, Source, User
 from .storage import get_db
-from .views import index, corpora, sources, templates, generate, source
+from . import views
 from .views.auth import session, account
 
 
@@ -112,12 +112,13 @@ app.config['SECRET_KEY'] = SECRET_KEY
 app.config['MAX_CONTENT_LENGTH'] = MAX_UPLOAD_SIZE
 
 routes = [
-    ('/', 'index', index, {}),
-    ('/generate', 'generate', generate, {'methods': ['GET', 'POST']}),
-    ('/corpora', 'corpora', corpora, {'methods': ['GET', 'POST', 'DELETE', 'PUT']}),
-    ('/sources', 'sources', sources, {'methods': ['GET']}),
-    ('/sources/<source_id>', 'source', source, {'methods': ['GET', 'PUT', 'POST', 'DELET']}),
-    ('/templates', 'templates', templates, {'methods': ['GET', 'POST', 'DELETE', 'PUT']}),
+    ('/', 'index', views.index, {}),
+    ('/generate', 'generate', views.generate, {'methods': ['GET', 'POST']}),
+    ('/corpora', 'corpora', views.corpora, {'methods': ['GET']}),
+    ('/sources', 'sources', views.sources, {'methods': ['GET']}),
+    ('/sources/<source_id>', 'source', views.source, {'methods': ['GET', 'PUT', 'POST', 'DELETE']}),
+    ('/corpora/<corpus_id>', 'corpus', views.corpus, {'methods': ['GET', 'PUT', 'POST', 'DELETE']}),
+    ('/templates', 'templates', views.templates, {'methods': ['GET', 'POST', 'DELETE', 'PUT']}),
     ('/auth/account', 'account', account,
      {'methods': ['GET', 'POST', 'DELETE', 'PUT']}),
     ('/auth/session', 'session', session, {'methods': ['POST', 'DELETE']}),
