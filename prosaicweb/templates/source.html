@@ -6,9 +6,8 @@
 
 {% block content %}
 <h1>{{source.name}}</h2>
-<form method="post" action="/sources">
+<form method="post" action="/sources/{{source.id}}">
     <input type="hidden" name="_method" value="DELETE">
-    <input type="hidden" name="source_id" value="{{source.id}}">
     <button>delete this source</button>
 </form>
 <form method="post" action="/sources/{{source.id}}">

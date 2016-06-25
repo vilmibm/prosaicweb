@@ -15,7 +15,7 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from functools import lru_cache
 
-from prosaic.models import Base, Source, Corpus
+from prosaic.models import Base, Source, Corpus, Phrase, corpora_sources
 from prosaic.parsing import process_text
 from sqlalchemy import create_engine, Column, Boolean, ForeignKey, Table
 from sqlalchemy.orm import relationship, sessionmaker

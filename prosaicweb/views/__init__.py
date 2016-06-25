@@ -16,7 +16,7 @@
 
 from flask import render_template, request, redirect
 # TODO don't use DEFAULT_DB
-from ..models import Source, Corpus, get_session, DEFAULT_DB
+from ..models import Source, Corpus, get_session, DEFAULT_DB, corpora_sources, Phrase
 
 # TODO types?
 
@@ -81,6 +81,16 @@ def corpus(corpus_id):
 
         return redirect('/corpora')
 
+    if method == 'DELETE':
+        session = get_session(DEFAULT_DB)
+        c = session.query(Corpus).filter(Corpus.id == corpus_id).one()
+        c.sources = []
+        session.commit()
+        session.query(Corpus).filter(Corpus.id == corpus_id).delete()
+        session.commit()
+
+        return redirect('/corpora')
+
 def sources():
     method = get_method(request)
     # TODO block on auth
@@ -111,7 +121,6 @@ def source(source_id):
         }
         return render_template('source.html', **context)
 
-    # srsly not rest at all. this is an update
     if method == 'PUT':
         session = get_session(DEFAULT_DB)
         s = session.query(Source).filter(Source.id == source_id).one()
@@ -120,7 +129,25 @@ def source(source_id):
         # TODO check if different and regenerate all phrases if so
         s.content = request.form['source_content']
         session.commit()
+
         return redirect('/sources')
+
+    if method == 'DELETE':
+        # TODO for love of god get on delete cascade working
+        session = get_session(DEFAULT_DB)
+        s = session.query(Source).filter(Source.id==source_id).one()
+        corpus_ids = session.query(corpora_sources.c.corpus_id).filter(
+            corpora_sources.c.source_id == source_id
+        ).all()
+        for c in session.query(Corpus).filter(Corpus.id.in_(corpus_ids)):
+            c.sources.remove(s)
+        session.query(Phrase).filter(Phrase.source_id == source_id).delete()
+        session.query(Source).filter(Source.id == source_id).delete()
+        session.commit()
+
+        return redirect('/sources')
+
+
 
 def templates(): pass
 def generate(): pass

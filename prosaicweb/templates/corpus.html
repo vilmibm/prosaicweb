@@ -8,7 +8,6 @@
 <h1>{{corpus.name}}</h2>
 <form method="post" action="/corpora/{{corpus.id}}">
     <input type="hidden" name="_method" value="DELETE">
-    <input type="hidden" name="corpus_id" value="{{corpus.id}}">
     <button>delete this corpus</button><br>
     <sub>note, deleting a corpus does not delete any associated sources</sub>
 </form>
