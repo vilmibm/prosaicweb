@@ -26,7 +26,7 @@
         <li>
             <label>
                 <input type="checkbox" name="sources" checked="true" value="{{source.id}}">
-                {{source.name}}
+                <a href="/sources/{{source.id}}">{{source.name}}</a>
             </label>
         </li>
         {% endfor %}
@@ -34,7 +34,7 @@
         <li>
             <label>
                 <input type="checkbox" name="sources" value="{{source.id}}">
-                {{source.name}}
+                <a href="/sources/{{source.id}}">{{source.name}}</a>
             </label>
         </li>
         {% endfor %}

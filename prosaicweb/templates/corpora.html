@@ -9,9 +9,25 @@
 
 <h2>add a new corpus</h2>
 <form method="POST" action="/corpora">
-    <label>name <input name="corpus_name"/></label>
-    <label>description <input name="corpus_description"/></label>
-    <button>submit</button>
+    <fieldset>
+        <legend>meta</legend>
+        <label>name <input name="corpus_name"/></label><br>
+        <label>description <input name="corpus_description"/></label>
+    </fieldset>
+    <fieldset>
+        <legend>sources</legend>
+        <ul>
+        {% for source in sources %}
+        <li>
+            <label>
+                <input type="checkbox" name="sources" value="{{source.id}}">
+                <a href="/sources/{{source.id}}">{{source.name}}</a>
+            </label>
+        </li>
+        {% endfor %}
+        </ul>
+    </fieldset>
+    <button>create</button>
 </form>
 
 <h2>existing corpora</h2>

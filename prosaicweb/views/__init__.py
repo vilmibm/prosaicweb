@@ -20,31 +20,36 @@ from ..models import Source, Corpus, get_session, DEFAULT_DB
 
 # TODO types?
 
-def get_method(req):
+def get_method(req) -> str:
     return req.form.get('_method', req.method)
 
 def index():
     return "main page lulz"
 
-class Foo:
-    def __init__(self, x, y):
-        self.name = x
-        self.description = y
-
 def corpora(): 
     method = get_method(request)
     # TODO block on auth
+    print('YEAH', method)
     if method == 'GET':
         session = get_session(DEFAULT_DB)
-        corpora = session.query(Corpus).all()
-        context = {'corpora': corpora,
+        context = {'corpora': session.query(Corpus).all(),
+                   'sources': session.query(Source).all(),
                    'authenticated': True,
                    'username': 'vilmibm'}
         return render_template('corpora.html', **context)
 
     if method == 'POST':
-        # TODO create new corpus
-        return ''
+        print('AW HI', request.form)
+        session = get_session(DEFAULT_DB)
+        c = Corpus()
+        c.name = request.form['corpus_name']
+        c.description = request.form['corpus_description']
+        for source_id in request.form.getlist('sources'):
+            s = session.query(Source).filter(Source.id==source_id).one()
+            c.sources.append(s)
+        session.add(c)
+        session.commit()
+        return redirect('corpora/{}'.format(c.id))
 
 def corpus(corpus_id):
     method = get_method(request)
@@ -66,7 +71,6 @@ def corpus(corpus_id):
         return render_template('corpus.html', **context)
 
     if method == 'PUT':
-        # TODO should I re-use this for creation? could None-ize corpus_id...
         session = get_session(DEFAULT_DB)
         c = session.query(Corpus).filter(Corpus.id == corpus_id).one()
         c.name = request.form['corpus_name']
@@ -74,6 +78,7 @@ def corpus(corpus_id):
         source_ids = map(int, request.form.getlist('sources'))
         c.sources = session.query(Source).filter(Source.id.in_(source_ids)).all()
         session.commit()
+
         return redirect('/corpora')
 
 def sources():

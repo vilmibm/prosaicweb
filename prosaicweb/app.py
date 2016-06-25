@@ -66,7 +66,7 @@ The base html of the site will have this row at the top:
 
     | generate | sources | corpora | templates | generate | ... | account
 
-where ... expands to fill available space. each link loads the governing template, which will 
+where ... expands to fill available space. each link loads the governing template, which will
 inevitably contain forms that POST etc to edit/add/delete things.
 
 
@@ -113,16 +113,32 @@ app.config['MAX_CONTENT_LENGTH'] = MAX_UPLOAD_SIZE
 
 routes = [
     ('/', 'index', views.index, {}),
-    ('/generate', 'generate', views.generate, {'methods': ['GET', 'POST']}),
-    ('/corpora', 'corpora', views.corpora, {'methods': ['GET']}),
-    ('/sources', 'sources', views.sources, {'methods': ['GET']}),
-    ('/sources/<source_id>', 'source', views.source, {'methods': ['GET', 'PUT', 'POST', 'DELETE']}),
-    ('/corpora/<corpus_id>', 'corpus', views.corpus, {'methods': ['GET', 'PUT', 'POST', 'DELETE']}),
-    ('/templates', 'templates', views.templates, {'methods': ['GET', 'POST', 'DELETE', 'PUT']}),
+
+    ('/generate', 'generate', views.generate,
+     {'methods': ['GET', 'POST']}),
+
+    ('/corpora', 'corpora', views.corpora,
+     {'methods': ['GET', 'POST',]}),
+
+    ('/sources', 'sources', views.sources,
+     {'methods': ['GET', 'POST',]}),
+
+    ('/sources/<source_id>', 'source', views.source,
+     {'methods': ['GET', 'PUT', 'POST', 'DELETE']}),
+
+    ('/corpora/<corpus_id>', 'corpus', views.corpus,
+     {'methods': ['GET', 'PUT', 'POST', 'DELETE']}),
+
+    ('/templates', 'templates', views.templates,
+     {'methods': ['GET', 'POST', 'DELETE', 'PUT']}),
+
     ('/auth/account', 'account', account,
      {'methods': ['GET', 'POST', 'DELETE', 'PUT']}),
-    ('/auth/session', 'session', session, {'methods': ['POST', 'DELETE']}),
+
+    ('/auth/session', 'session', session,
+     {'methods': ['POST', 'DELETE']}),
 ]
+
 
 for [route, name, fn, opts] in routes:
     app.add_url_rule(route, name, fn, **opts)
