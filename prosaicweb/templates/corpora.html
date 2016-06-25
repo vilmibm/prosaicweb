@@ -15,7 +15,7 @@
 </form>
 
 <h2>existing corpora</h2>
-<table>
+<table border="true">
     <tr>
         <th>name</th> <th>description</th> <th>sources</th>
     </tr>
@@ -25,10 +25,12 @@
         <td>{{ corpus.description }}</td>
         <td>
         {% for source in corpus.sources %}
-            <a href="/sources#{{ source.name }}">source.name</a>%nbsp;
+        {# TODO want a url_for_source that can take a source #}
+        <a href="/sources#{{ source.name }}">{{source.name}}</a>&nbsp;
         {% endfor %}
         </td>
         <td>
+            <a href="/edit/{{corpus.name}}">edit</a>
             <form method="DELETE" action="/sources">
                 <input type="hidden" name="corpus_id" value="{{ corpus.id }}">
                 <button>delete</button>

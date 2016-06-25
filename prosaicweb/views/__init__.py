@@ -14,33 +14,63 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from flask import render_template, request
+from flask import render_template, request, redirect
 # TODO don't use DEFAULT_DB
-from ..models import Corpus, get_session, DEFAULT_DB
+from ..models import Source, Corpus, get_session, DEFAULT_DB
 
 # TODO types?
 
 def index():
     return "main page lulz"
 
+class Foo:
+    def __init__(self, x, y):
+        self.name = x
+        self.description = y
+
 def corpora(): 
     # TODO block on auth
     if request.method == 'GET':
-        context = {'corpora':[],
-                   # 'authenticated': False, }
+        session = get_session(DEFAULT_DB)
+        corpora = session.query(Corpus).all()
+        context = {'corpora': corpora,
                    'authenticated': True,
                    'username': 'vilmibm'}
         return render_template('corpora.html', **context)
 
+def sources():
+    # TODO block on auth
+    if request.method == 'GET':
+        session = get_session(DEFAULT_DB)
+        sources = session.query(Source).all()
+        for source in sources:
+            source.content_preview = source.content[0:250] + '...'
+        context = {'sources':sources,
+                   'authenticated':True,
+                   'username': 'vilmibm'}
+        return render_template('sources.html', **context)
+
+def source(source_id):
+    if request.method == 'GET':
+        session = get_session(DEFAULT_DB)
+        s = session.query(Source).filter(Source.id == source_id).one()
+        context = {
+            'source':s,
+            'authenticated':True,
+            'username':'vilmibm',
+        }
+        return render_template('source.html', **context)
+
+    # srsly not rest at all. this is an update
     if request.method == 'POST':
-        return "TODO"
+        session = get_session(DEFAULT_DB)
+        s = session.query(Source).filter(Source.id == source_id).one()
+        s.name = request.form['source_name']
+        s.description = request.form['source_description']
+        # TODO check if different and regenerate all phrases if so
+        s.content = request.form['source_content']
+        session.commit()
+        return redirect('/sources')
 
-    if request.method == 'PUT':
-        return "TODO"
-
-    if request.method == 'DELETE':
-        return "TODO"
-
-def sources(): pass
 def templates(): pass
 def generate(): pass

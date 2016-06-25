@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>sources - prosiacweb</title>
+{% endblock %}
+
+{% block content %}
+<h1>sources</h1>
+
+<h2>add a new source</h2>
+<form method="POST" action="/sources">
+    <fieldset>
+        <legend>meta</legend>
+        <label>name <input name="source_name"></label><br>
+        <label>description <textarea name="source_description"></textarea></label>
+    </fieldset>
+    <fieldset>
+        <legend>content of source</legend>
+        <label>file <input type="file" name="content_file"></label><br>
+        <strong>or</strong><br>
+        <label>copypasta <textarea name="content_paste"></textarea></label>
+    </fieldset>
+    <button>submit</button>
+</form>
+
+<h2>existing sources</h2>
+<table border="true">
+    <tr>
+        <th>name</th> <th>description</th> <th>content preview</th>
+    </tr>
+    {% for source in sources %}
+    <tr>
+        <td><a href="/sources/{{source.id}}">{{ source.name }}</a></td>
+        <td>{{ source.description }}</td>
+        {# TODO make/use a filter for this: #}
+        <td>{{ source.content_preview }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
