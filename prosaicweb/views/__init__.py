@@ -20,6 +20,9 @@ from ..models import Source, Corpus, get_session, DEFAULT_DB
 
 # TODO types?
 
+def get_method(req):
+    return req.form.get('_method', req.method)
+
 def index():
     return "main page lulz"
 
@@ -29,8 +32,9 @@ class Foo:
         self.description = y
 
 def corpora(): 
+    method = get_method(request)
     # TODO block on auth
-    if request.method == 'GET':
+    if method == 'GET':
         session = get_session(DEFAULT_DB)
         corpora = session.query(Corpus).all()
         context = {'corpora': corpora,
@@ -38,12 +42,14 @@ def corpora():
                    'username': 'vilmibm'}
         return render_template('corpora.html', **context)
 
-    if request.method == 'POST':
+    if method == 'POST':
         # TODO create new corpus
         return ''
 
 def corpus(corpus_id):
-    if request.method == 'GET':
+    method = get_method(request)
+
+    if method == 'GET':
         session = get_session(DEFAULT_DB)
         c = session.query(Corpus).filter(Corpus.id == corpus_id).one()
         source_ids = map(lambda s: s.id, c.sources)
@@ -59,8 +65,7 @@ def corpus(corpus_id):
         }
         return render_template('corpus.html', **context)
 
-    # srsly not rest at all. this is an update
-    if request.method == 'POST':
+    if method == 'PUT':
         # TODO should I re-use this for creation? could None-ize corpus_id...
         session = get_session(DEFAULT_DB)
         c = session.query(Corpus).filter(Corpus.id == corpus_id).one()
@@ -72,8 +77,9 @@ def corpus(corpus_id):
         return redirect('/corpora')
 
 def sources():
+    method = get_method(request)
     # TODO block on auth
-    if request.method == 'GET':
+    if method == 'GET':
         session = get_session(DEFAULT_DB)
         sources = session.query(Source).all()
         for source in sources:
@@ -83,13 +89,14 @@ def sources():
                    'username': 'vilmibm'}
         return render_template('sources.html', **context)
 
-    if request.method == 'POST':
+    if method == 'POST':
         # TODO create new source from form
         return ''
 
-
 def source(source_id):
-    if request.method == 'GET':
+    method = request.form.get('_method', request.method)
+
+    if method == 'GET':
         session = get_session(DEFAULT_DB)
         s = session.query(Source).filter(Source.id == source_id).one()
         context = {
@@ -100,7 +107,7 @@ def source(source_id):
         return render_template('source.html', **context)
 
     # srsly not rest at all. this is an update
-    if request.method == 'POST':
+    if method == 'PUT':
         session = get_session(DEFAULT_DB)
         s = session.query(Source).filter(Source.id == source_id).one()
         s.name = request.form['source_name']
