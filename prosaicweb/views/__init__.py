@@ -104,6 +104,7 @@ def sources():
         return render_template('sources.html', **context)
 
     if method == 'POST':
+        session = get_session(DEFAULT_DB)
         s = Source()
         s.name = request.form['source_name']
         s.description = request.form['source_description']
@@ -116,13 +117,11 @@ def sources():
         if len(content) == 0:
             return Response('Got empty content for source.', 400)
 
-        process_text(DEFAULT_DB, s, content)
-        # TODO bug here until name is unique; either way, process_text should
-        # return source's new id
-        session = get_session(DEFAULT_DB)
-        new_source = session.query(Source).filter(Source.name == s.name).one()
+        session.add(s)
+        process_text(s, content)
+        session.commit()
 
-        return redirect('/sources/{}'.format(new_source.id))
+        return redirect('/sources/{}'.format(s.id))
 
 def source(source_id):
     method = request.form.get('_method', request.method)
@@ -145,11 +144,8 @@ def source(source_id):
         s.description = request.form['source_description']
         new_content = request.form['source_content']
         if new_content != s.content:
-            pass
-            # TODO see if I can get a session out of a source model, and then
-            # refactor process_text
-            # TODO delete all the source's phrases
-            # TODO call process_text on new_content
+            session.query(Phrase).filter(Phrase.source_id == s.id).delete()
+            process_text(s, new_content)
         session.commit()
 
         return redirect('/sources')
