@@ -8,11 +8,17 @@
 <h1>sources</h1>
 
 <h2>add a new source</h2>
-<form method="POST" action="/sources">
+<form method="POST" action="/sources" enctype="multipart/form-data">
     <fieldset>
         <legend>meta</legend>
-        <label>name <input name="source_name"></label><br>
-        <label>description <textarea name="source_description"></textarea></label>
+        <p>
+          <label>name <input name="source_name"></label>
+        </p>
+        <p>
+          <label>description
+            <textarea name="source_description"></textarea>
+          </label>
+        </p>
     </fieldset>
     <fieldset>
         <legend>content of source</legend>
@@ -20,6 +26,12 @@
         <strong>or</strong><br>
         <label>copypasta <textarea name="content_paste"></textarea></label>
     </fieldset>
+    <p>
+    <strong>NOTE it can take several minutes to process a source.</strong>
+    </p>
+    {# TODO maybe create the source in the DB with no content and start up a
+    background thread to parse it; user can refresh the source's detail page
+    until the phrases show up. #}
     <button>submit</button>
 </form>
 

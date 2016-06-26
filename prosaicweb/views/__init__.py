@@ -13,8 +13,9 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from flask import render_template, request, redirect, Response
+from prosaic.parsing import process_text
 
-from flask import render_template, request, redirect
 # TODO don't use DEFAULT_DB
 from ..models import Source, Corpus, get_session, DEFAULT_DB, corpora_sources, Phrase
 
@@ -26,10 +27,9 @@ def get_method(req) -> str:
 def index():
     return "main page lulz"
 
-def corpora(): 
+def corpora():
     method = get_method(request)
     # TODO block on auth
-    print('YEAH', method)
     if method == 'GET':
         session = get_session(DEFAULT_DB)
         context = {'corpora': session.query(Corpus).all(),
@@ -39,7 +39,6 @@ def corpora():
         return render_template('corpora.html', **context)
 
     if method == 'POST':
-        print('AW HI', request.form)
         session = get_session(DEFAULT_DB)
         c = Corpus()
         c.name = request.form['corpus_name']
@@ -105,8 +104,25 @@ def sources():
         return render_template('sources.html', **context)
 
     if method == 'POST':
-        # TODO create new source from form
-        return ''
+        s = Source()
+        s.name = request.form['source_name']
+        s.description = request.form['source_description']
+        content = ''
+        if len(request.form['content_paste']) > 0:
+            content = request.form['content_paste']
+        elif request.files.get('content_file'):
+            content = str(request.files['content_file'].read())
+
+        if len(content) == 0:
+            return Response('Got empty content for source.', 400)
+
+        process_text(DEFAULT_DB, s, content)
+        # TODO bug here until name is unique; either way, process_text should
+        # return source's new id
+        session = get_session(DEFAULT_DB)
+        new_source = session.query(Source).filter(Source.name == s.name).one()
+
+        return redirect('/sources/{}'.format(new_source.id))
 
 def source(source_id):
     method = request.form.get('_method', request.method)
@@ -114,6 +130,7 @@ def source(source_id):
     if method == 'GET':
         session = get_session(DEFAULT_DB)
         s = session.query(Source).filter(Source.id == source_id).one()
+        # TODO get this phrase's sources and put em in a table
         context = {
             'source':s,
             'authenticated':True,
@@ -126,8 +143,13 @@ def source(source_id):
         s = session.query(Source).filter(Source.id == source_id).one()
         s.name = request.form['source_name']
         s.description = request.form['source_description']
-        # TODO check if different and regenerate all phrases if so
-        s.content = request.form['source_content']
+        new_content = request.form['source_content']
+        if new_content != s.content:
+            pass
+            # TODO see if I can get a session out of a source model, and then
+            # refactor process_text
+            # TODO delete all the source's phrases
+            # TODO call process_text on new_content
         session.commit()
 
         return redirect('/sources')
