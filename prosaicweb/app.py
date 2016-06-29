@@ -129,6 +129,9 @@ routes = [
     ('/corpora/<corpus_id>', 'corpus', views.corpus,
      {'methods': ['GET', 'PUT', 'POST', 'DELETE']}),
 
+    ('/phrases', 'phrases', views.phrases,
+     {'methods': ['POST']}), # technically just DELETE
+
     ('/templates', 'templates', views.templates,
      {'methods': ['GET', 'POST', 'DELETE', 'PUT']}),
 

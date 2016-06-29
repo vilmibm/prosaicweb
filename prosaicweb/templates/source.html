@@ -23,5 +23,33 @@
     </fieldset>
     <button>update</button>
 </form>
+<h2>phrases parsed from this source</h2>
+<form action="/phrases" method="post">
+  <input type="hidden" name="_method" value="DELETE">
+  <input type="hidden" name="source" value="{{source.id}}">
+  <button>delete selected phrases</button>
+  <table>
+    <tr>
+      <th></th><th>raw</th><th>syllables</th>
+      <th>rhyme sound</th><th>alliteration?</th><th>stems</th>
+    </tr>
+    {% for phrase in source.phrases %}
+    <tr>
+      <td> <input name="phrases" type="checkbox" value="{{phrase.id}}"> </td>
+      <td>{{phrase.raw}}</td>
+      <td>{{phrase.syllables}}</td>
+      <td>{{phrase.rhyme_sound}}</td>
+      <td>
+        {% if phrase.alliteration %}
+        Y
+        {% else %}
+        N
+        {% endif %}
+      </td>
+      <td>{{phrase.stems}}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</form>
 {% endblock %}
 

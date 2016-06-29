@@ -166,6 +166,32 @@ def source(source_id):
         return redirect('/sources')
 
 
+def phrases():
+    method = get_method(request)
+
+    if method == 'DELETE':
+        session = get_session(DEFAULT_DB)
+        s = session.query(Source)\
+                   .filter(Source.id == request.form['source'])\
+                   .one()
+        phrase_ids = map(int, request.form.getlist('phrases'))
+        session.query(Phrase).filter(Phrase.id.in_(phrase_ids))\
+                             .delete(synchronize_session='fetch')
+
+        s.content = ' '.join(map(lambda p: p.raw, s.phrases))
+
+        session.commit()
+
+        return redirect('/sources/{}'.format(s.id))
 
 def templates(): pass
-def generate(): pass
+
+def generate():
+    session = get_session(DEFAULT_DB)
+    corpora = session.query(Corpus).all()
+    context = {
+        'username': 'vilmibm',
+        'authenticated': True,
+        'corpora': corpora,
+    }
+    return render_template('generate.html', **context)

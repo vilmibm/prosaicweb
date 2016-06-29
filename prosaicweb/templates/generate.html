@@ -1,108 +1,59 @@
-<!DOCTYPE html>
-<!--
-# prosaicweb
-# Copyright (C) 2015  nathaniel smith
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Affero General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Affero General Public License for more details.
-#
-# You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
--->
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>generate some poetry</title>
-        <link rel="stylesheet" href="/static/generate.css">
-        <link rel="stylesheet" href="/static/codemirror/codemirror.css">
-    </head>
-    <div id="authinfo">
-    {% if user_name %}
-    <form id="logout" action="/logout" method="post">
-        logged in as <b>{{ user_name }}</b> <input type="submit" value="log out">
-    </form>
-    {% else %}
-    <sub><b>hello anonymous user</b>, feel free to play with this tool! if you <a href="/auth">authenticate</a>, you can upload your own source texts to cut up.</sub>
-    {% endif %}
-    </div>
-    <h1>{{ site_name }}</h1>
-    <p>
-        for more information on prosaic, check out its <a href="https://github.com/nathanielksmith/prosaic">readme</a>.
-    </p>
-    {% if user_name %}
-    <form id="upload">
-        <h2>upload new source</h2>
-        <sub>
-            limit 5mb per file. your files are not visible to other users.
-        </sub>
-        <p>
-            name of file: <input required="true" name="upload_name" type="text">
-        </p>
-        <p>
-            <input required="true" name="upload" type="file">
-        </p>
-        <p>
-            <input type="submit" value="upload!">
-        </p>
-    </form>
-    {% endif %}
-    <body>
-        <div id="content">
-            <div id="col0">
-                <h2>generate some poetry</h2>
-                <form id="generate">
-                    <h3>sources</h3>
-                    <p>
-                        <span class="system source">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>: default source
-                    </p>
-                    <p>
-                        <b>ctrl+click</b> to combine multiple sources.
-                    </p>
-                    <p>
-                      <select required="true" id="sources" name="source" multiple="true">
-                          {% for source in sources %}
-                          <option {% if source.system %}
-                                  class="system source"
-                                  {% else %}
-                                  class="user source"
-                                  {% endif %}>
-                              {{source.name}}
-                          </option>
-                          {% endfor %}
-                      </select>
+{# prosaicweb #}
+{# Copyright (C) 2015  nathaniel smith#}
+{# This program is free software: you can redistribute it and/or modify#}
+{# it under the terms of the GNU Affero General Public License as published by#}
+{# the Free Software Foundation, either version 3 of the License, or#}
+{# (at your option) any later version.#}
 
-                    </p>
-                    <p>
-                    <input type="checkbox" name="truncate"><span>truncate longer sources to match shortest source?</span>
-                    </p>
+{# This program is distributed in the hope that it will be useful,#}
+{# but WITHOUT ANY WARRANTY; without even the implied warranty of#}
+{# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the#}
+{# GNU Affero General Public License for more details.#}
 
-                    <h3>template</h3>
-                    <select id="templates" name="template_name">
-                        {% for template in templates %}
-                        <option value="{{template.name}}" data-content="{{template.json}}"> {{template.name}} </option>
-                        {% endfor %}
-                    </select>
-                    <p>you can pre-load an existing template into the text box below and then tweak as yr beautiful heart desires.</p>
-                    <textarea rows="30" name="template_raw"></textarea>
-                    <br>
-                    <input type="submit"  value="generate">
-                </form>
-            </div>
-            <div id="col1">
-                <h2>output</h2>
-                <div id="output">
-                </div>
-            </div>
-        </div>
-        <script src="/static/codemirror/codemirror.js"></script>
-        <script src="/static/codemirror/mode/javascript.js" ></script>
-        <script src="/static/generate.js"></script>
-    </body>
-</html>
+{# You should have received a copy of the GNU Affero General Public License#}
+{# along with this program.  If not, see <http://www.gnu.org/licenses/>.#}
+
+{% extends "base.html" %}
+
+{% block head %}
+<title>generate poetry</title>
+<link rel="stylesheet" href="/static/codemirror/codemirror.css">
+{% endblock %}
+
+{% block content %}
+<h2>generate poetry</h2>
+
+<div>
+<form id="generate">
+  <button>generate -&gt;</button>
+  <p>
+    <label>corpus<br>
+      <select name="corpus_id">
+        {% for corpus in corpora %}
+        <option value="{{corpus.id}}">
+          {{corpus.name}}
+        </option>
+        {% endfor %}
+      </select>
+    </label>
+  </p>
+  <p>
+    <label>template<br>
+      <select>
+        {# TODO support template stuff #}
+      </select>
+    </label>
+  </p>
+  <p>
+    <label>template preview<br>
+      <textarea name="template_edit"></textarea>
+    </label>
+  </p>
+</form>
+</div>
+<div style="float:right;border-left:1px solid black">
+</div>
+<script src="/static/codemirror/codemirror.js"></script>
+<script src="/static/codemirror/mode/javascript.js" ></script>
+<script src="/static/generate.js"></script>
+{% endblock %}
