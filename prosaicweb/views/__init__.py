@@ -167,6 +167,7 @@ def source(source_id):
 
 
 def phrases():
+    # TODO auth
     method = get_method(request)
 
     if method == 'DELETE':
@@ -187,11 +188,15 @@ def phrases():
 def templates(): pass
 
 def generate():
-    session = get_session(DEFAULT_DB)
-    corpora = session.query(Corpus).all()
-    context = {
-        'username': 'vilmibm',
-        'authenticated': True,
-        'corpora': corpora,
-    }
-    return render_template('generate.html', **context)
+    # TODO auth
+    method = get_method(request)
+
+    if method == 'GET':
+        session = get_session(DEFAULT_DB)
+        corpora = session.query(Corpus).all()
+        context = {
+            'username': 'vilmibm',
+            'authenticated': True,
+            'corpora': corpora,
+        }
+        return render_template('generate.html', **context)
