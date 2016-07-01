@@ -3,17 +3,16 @@
 console.log('loaded generate.js');
 
 if (!CodeMirror) {
-    throw "Missing requirement CodeMirror";
+    throw 'Missing requirement CodeMirror';
+}
+
+if (!prosaicweb) {
+    throw 'Missing requirement prosaicweb';
 }
 
 (function () {
     // grumph
     var qs = document.querySelector.bind(document);
-
-    // TODO this is a stupid hack.
-    JSON.pretty_print = function (json_string) {
-        return this.stringify(this.parse(json_string), undefined, 2);
-    };
 
     // events
     var template_selected = function (state, e) {
@@ -48,9 +47,23 @@ if (!CodeMirror) {
         close_button.container = poem_container;
         poem_controls.appendChild(close_button);
 
+        var corpus_name = document.createElement('span');
+        var corpus_link = document.createElement('a');
+        corpus_link.href = "/corpora/" + poem.corpus.id;
+        corpus_link.innerHTML = poem.corpus.name;
+        corpus_name.innerHTML = " from corpus ";
+        corpus_name.appendChild(corpus_link);
+        poem_controls.appendChild(corpus_name);
+
         var sources_list = document.createElement('sub');
         sources_list.innerHTML = 'sources: ';
-        sources_list.innerHTML += sources.join(', ');
+        sources.forEach(function(source) {
+            var source_link = document.createElement('a');
+            source_link.href = "/sources/" + source.id;
+            source_link.innerHTML = source.name;
+            sources_list.appendChild(source_link);
+            sources_list.innerHTML += ' ';
+        });
 
         poem_container.appendChild(poem_controls);
         poem_container.appendChild(pre);
@@ -89,8 +102,6 @@ if (!CodeMirror) {
         ),
     };
 
-    // TODO this seemed unused:
-    // NodeList.prototype.forEach = Array.prototype.forEach;
     state.template_select.addEventListener(
         'change',
         template_selected.bind(null, state)

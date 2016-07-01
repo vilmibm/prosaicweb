@@ -243,14 +243,28 @@ def generate():
     method = get_method(request)
 
     if method == 'POST':
-        print(request.form)
+        session = get_session(DEFAULT_DB)
         corpus_id = request.form['corpus_id']
+        corpus_name = session.query(Corpus.name)\
+                             .filter(Corpus.id==corpus_id)\
+                             .one()[0]
         t = json.loads(request.form['template_tweak'])
         poem = poem_from_template(t, DEFAULT_DB, corpus_id)
+        source_ids = set(map(lambda p: p[1], poem))
+        get_source_name = lambda sid:\
+                          session.query(Source.name).filter(Source.id==sid).one()[0]
+        ss = map(
+            lambda sid: {'id':sid, 'name': get_source_name(sid)},
+            source_ids
+        )
 
         result = {
+            'corpus': {
+                'id': corpus_id,
+                'name': corpus_name,
+            },
             'lines': list(map(lambda p: p[0], poem)),
-            'used_sources': ['TODO'],
+            'used_sources': list(ss),
         }
 
         return json.dumps(result)

@@ -5,6 +5,11 @@ body {
 h1 { font-family: georgia; clear:both; }
 h2 { font-family: georgia; }
 
+textarea {
+    width: 50em;
+    height: 15em;
+}
+
 #top {
     width: 100%;
     clear: both;
@@ -58,4 +63,9 @@ h2 { font-family: georgia; }
 
 #generate button {
     font-size:150%;
+}
+
+.poem_container {
+    margin:1em;
+    background: rgba(150,0,70,.1);
 }

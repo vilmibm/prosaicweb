@@ -5,25 +5,9 @@
 {% endblock %}
 
 {% block content %}
-<h1>templatez</h1>
-<h2>add a new template</h2>
-<form action="/templates" method="POST">
-  <input type="hidden" name="_method" value="POST">
-  <p>
-    <label>name
-      <input type="text" name="template_name">
-    </label>
-  </p>
-  <p>
-<textarea name="template_json" rows="10" cols="60">[
-  {},
-  {},
-  {}
-]</textarea>
-  </p>
-  <button>create</button>
-</form>
-<h2>existing templates</h2>
+<h2>templates</h2>
+<a href="#new"><button>+</button></a>
+
 <table border="true">
   <tr>
     <th>name</th><th>preview</th>
@@ -39,4 +23,19 @@
   </tr>
   {% endfor %}
 </table>
+
+<a name="new"></a>
+<h2>add a new template</h2>
+<form action="/templates" method="POST">
+  <input type="hidden" name="_method" value="POST">
+  <p>
+    <label>name
+      <input type="text" name="template_name">
+    </label>
+  </p>
+  <p>
+    <textarea class="json" name="template_json" rows="10" cols="60">[{}, {}, {}]</textarea>
+  </p>
+  <button>create</button>
+</form>
 {% endblock %}

@@ -18,7 +18,7 @@ setup(
     install_requires = ['SQLAlchemy==1.0.12',
                         'flask==0.11.1',
                         'psycopg2==2.6.1',
-                        'prosaic==5.0.0'],
+                        'prosaic==5.1.0'],
     entry_points = {
           'console_scripts': [
               'prosaicweb = prosaicweb.__init__:main'
