@@ -17,6 +17,7 @@ import json
 
 from flask import render_template, request, redirect, Response
 from prosaic.parsing import process_text
+from prosaic.generation import poem_from_template
 
 # TODO don't use DEFAULT_DB
 from ..models import Source, Corpus, get_session, DEFAULT_DB, corpora_sources, Phrase, Template
@@ -241,12 +242,27 @@ def generate():
     # TODO auth
     method = get_method(request)
 
+    if method == 'POST':
+        print(request.form)
+        corpus_id = request.form['corpus_id']
+        t = json.loads(request.form['template_tweak'])
+        poem = poem_from_template(t, DEFAULT_DB, corpus_id)
+
+        result = {
+            'lines': list(map(lambda p: p[0], poem)),
+            'used_sources': ['TODO'],
+        }
+
+        return json.dumps(result)
+
     if method == 'GET':
         session = get_session(DEFAULT_DB)
-        corpora = session.query(Corpus).all()
+        cs = session.query(Corpus).all()
+        ts = session.query(Template).all()
         context = {
             'username': 'vilmibm',
             'authenticated': True,
-            'corpora': corpora,
+            'corpora': cs,
+            'templates': ts,
         }
         return render_template('generate.html', **context)
