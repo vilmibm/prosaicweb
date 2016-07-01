@@ -2,10 +2,6 @@
 // code for the poetry generation form
 console.log('loaded generate.js');
 
-if (!CodeMirror) {
-    throw 'Missing requirement CodeMirror';
-}
-
 if (!prosaicweb) {
     throw 'Missing requirement prosaicweb';
 }
@@ -23,7 +19,7 @@ if (!prosaicweb) {
         else {
             option = qs("option[value=" + e.target.value + "]");
         }
-        state.template_editor.setValue(JSON.pretty_print(option.dataset.json));
+        state.template_editor.value = JSON.pretty_print(option.dataset.json);
     };
 
     var successful_generation = function (state, e) {
@@ -96,10 +92,7 @@ if (!prosaicweb) {
         generate_form: qs('#generate'),
         output: qs('#output'),
         preselected_template_option: qs('#templates').selectedOptions[0],
-        template_editor: CodeMirror.fromTextArea(
-            qs('textarea'),
-            {mode:'javascript'}
-        ),
+        template_editor: qs('textarea')
     };
 
     state.template_select.addEventListener(
@@ -111,9 +104,7 @@ if (!prosaicweb) {
         submit_generation.bind(null, state),
         true
     );
-    state.template_editor.setValue(
-        JSON.pretty_print(
-            state.preselected_template_option.dataset.json
-        )
+    state.template_editor.value = JSON.pretty_print(
+        state.preselected_template_option.dataset.json
     );
 })();
