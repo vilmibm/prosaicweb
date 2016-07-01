@@ -38,3 +38,24 @@ h2 { font-family: georgia; }
 .tab.right form {
     display: inline;
 }
+
+.col0 {
+    float:left;
+    width: 45%;
+    background: rgba(0,0,0,.3);
+    padding: 1em;
+}
+.col1 {
+    width: 45%;
+    border-left: 1px solid black;
+    float:right;
+    padding:1em;
+}
+
+.CodeMirror {
+    border: 1px solid black;
+}
+
+#generate button {
+    font-size:150%;
+}

@@ -23,12 +23,12 @@
 {% block content %}
 <h2>generate poetry</h2>
 
-<div>
+<div class="col0">
 <form id="generate" action="/generate" method="POST">
   {# this form should still work without javascript #}
-  <button>generate -&gt;</button>
+  <button>generate -------------&gt;</button>
   <p>
-    <label>corpus<br>
+    <label><h3>corpus</h3>
       <select name="corpus_id">
         {% for corpus in corpora %}
         <option value="{{corpus.id}}">
@@ -39,7 +39,7 @@
     </label>
   </p>
   <p>
-    <label>template<br>
+    <label><h3>template</h3>
       <select id="templates">
         {% for template in templates %}
         <option name="template_id" value="{{template.id}}" data-json="{{template.json}}">{{template.name}}</option>
@@ -48,13 +48,13 @@
     </label>
   </p>
   <p>
-    <label>tweak template:<br>
+    <label><h3>tweak template:</h3>
       <textarea name="template_tweak"></textarea>
     </label>
   </p>
 </form>
 </div>
-<div style="float:right;border-left:1px solid black">
+<div class="col1">
   <p id="output"></p>
 </div>
 <script src="/static/codemirror/codemirror.js"></script>
