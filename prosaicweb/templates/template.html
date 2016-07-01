@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>{{template.name}} template - prosaicweb</title>
+{% endblock %}
+
+{% block content %}
+<h1>template: {{template.name}}</h1>
+
+<form action="/templates/{{template.id}}" method="POST">
+  <input type="hidden" name="_method" value="DELETE">
+  <button>delete this template</button>
+</form>
+
+<form action="/templates/{{template.id}}" method="POST">
+  <input type="hidden" name="_method" value="PUT">
+  <p>
+  <label>
+    name
+    <input type="text" name="template_name" value="{{template.name}}">
+  </label>
+  </p>
+  <p>
+  <textarea name="template_json">{{template.json}}</textarea>
+  </p>
+  <button>update</button>
+</form>
+{% endblock %}

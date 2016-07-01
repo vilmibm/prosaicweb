@@ -13,11 +13,13 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import json
+
 from flask import render_template, request, redirect, Response
 from prosaic.parsing import process_text
 
 # TODO don't use DEFAULT_DB
-from ..models import Source, Corpus, get_session, DEFAULT_DB, corpora_sources, Phrase
+from ..models import Source, Corpus, get_session, DEFAULT_DB, corpora_sources, Phrase, Template
 
 # TODO types?
 
@@ -165,7 +167,6 @@ def source(source_id):
 
         return redirect('/sources')
 
-
 def phrases():
     # TODO auth
     method = get_method(request)
@@ -185,7 +186,56 @@ def phrases():
 
         return redirect('/sources/{}'.format(s.id))
 
-def templates(): pass
+def templates():
+    # TODO auth
+    method = get_method(request)
+
+    if method == 'POST':
+        session = get_session(DEFAULT_DB)
+        t = Template(name=request.form['template_name'],
+                     lines=json.loads(request.form['template_json']))
+        session.add(t)
+        session.commit()
+        return redirect('/templates/{}'.format(t.id))
+
+    if method == 'GET':
+        session = get_session(DEFAULT_DB)
+        ts = session.query(Template).all()
+        context = {
+            'username': 'vilmibm',
+            'authenticated': True,
+            'templates': ts,
+        }
+        return render_template('templates.html', **context)
+
+def template(template_id):
+    # TODO auth
+    method = get_method(request)
+
+    if method == 'PUT':
+        session = get_session(DEFAULT_DB)
+        t = session.query(Template).filter(Template.id == template_id).one()
+        t.name = request.form['template_name']
+        t.lines = json.loads(request.form['template_json'])
+        session.add(t)
+        session.commit()
+        return redirect('/templates/{}'.format(template_id))
+
+    if method == 'DELETE':
+        session = get_session(DEFAULT_DB)
+        session.query(Template).filter(Template.id == template_id).delete()
+        session.commit()
+        return redirect('/templates')
+
+    if method == 'GET':
+        session = get_session(DEFAULT_DB)
+        t = session.query(Template).filter(Template.id == template_id).one()
+        context = {
+            'username': 'vilmibm',
+            'authenticated': True,
+            'template': t,
+        }
+        return render_template('template.html', **context)
 
 def generate():
     # TODO auth

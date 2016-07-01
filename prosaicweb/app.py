@@ -112,6 +112,12 @@ app.config['SECRET_KEY'] = SECRET_KEY
 app.config['MAX_CONTENT_LENGTH'] = MAX_UPLOAD_SIZE
 
 routes = [
+
+    # TODO
+    # because html is dumb and forms can only use post/get, that's all we take
+    # here. However, within each view function, we check for a _method on a
+    # POST and treat that as the method. This should really be handled by a
+    # middleware.
     ('/', 'index', views.index, {}),
 
     ('/generate', 'generate', views.generate,
@@ -124,22 +130,25 @@ routes = [
      {'methods': ['GET', 'POST',]}),
 
     ('/sources/<source_id>', 'source', views.source,
-     {'methods': ['GET', 'PUT', 'POST', 'DELETE']}),
+     {'methods': ['GET', 'POST']}),
 
     ('/corpora/<corpus_id>', 'corpus', views.corpus,
-     {'methods': ['GET', 'PUT', 'POST', 'DELETE']}),
+     {'methods': ['GET', 'POST']}),
 
     ('/phrases', 'phrases', views.phrases,
-     {'methods': ['POST']}), # technically just DELETE
+     {'methods': ['POST']}),
 
     ('/templates', 'templates', views.templates,
-     {'methods': ['GET', 'POST', 'DELETE', 'PUT']}),
+     {'methods': ['GET', 'POST']}),
+
+    ('/templates/<template_id>', 'template', views.template,
+     {'methods': ['GET', 'POST']}),
 
     ('/auth/account', 'account', account,
-     {'methods': ['GET', 'POST', 'DELETE', 'PUT']}),
+     {'methods': ['GET', 'POST']}),
 
     ('/auth/session', 'session', session,
-     {'methods': ['POST', 'DELETE']}),
+     {'methods': ['POST']}),
 ]
 
 

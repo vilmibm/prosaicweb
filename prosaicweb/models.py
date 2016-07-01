@@ -13,6 +13,7 @@
 #
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import json
 from functools import lru_cache
 
 from prosaic.models import Base, Source, Corpus, Phrase, corpora_sources
@@ -20,7 +21,7 @@ from prosaic.parsing import process_text
 from sqlalchemy import create_engine, Column, Boolean, ForeignKey, Table
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.engine import Engine
-from sqlalchemy.dialects.postgresql import ARRAY, TEXT, INTEGER
+from sqlalchemy.dialects.postgresql import ARRAY, TEXT, INTEGER, JSON
 from sqlalchemy.ext.declarative import declarative_base
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -78,15 +79,31 @@ class Template(Base):
     __tablename__ = 'templates'
 
     id = Column(INTEGER, primary_key=True)
-    # TODO
+    name = Column(TEXT, nullable=False)
+    lines = Column(JSON, nullable=False)
+
+    @property
+    def json(self) -> str:
+        return json.dumps(self.lines)
+
+    @property
+    def pretty(self) -> str:
+        # TODO wtf
+        output = ''
+        for line in self.lines:
+            output += json.dumps(line) + '\n'
+        return output
+
+    def __repr__(self) -> str:
+        return "Template<'{}'>".format(self.lines)
 
 class User(Base):
     __tablename__ = 'users'
 
     id = Column(INTEGER, primary_key=True)
-    username = Column(TEXT)
-    pwhash = Column(TEXT)
-    email = Column(TEXT)
+    username = Column(TEXT, nullable=False)
+    pwhash = Column(TEXT, nullable=False)
+    email = Column(TEXT, nullable=False)
 
     sources = relationship('Source', secondary=users_sources)
     corpora = relationship('Corpus', secondary=users_corpora)
@@ -95,4 +112,3 @@ class User(Base):
     def __repr__(self) -> str:
         return "User(username='{}', email='{}', pwhash='{}')".format(
             self.username, self.email, self.pwhash)
-
