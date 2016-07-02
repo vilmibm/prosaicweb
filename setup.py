@@ -17,6 +17,8 @@ setup(
     packages=['prosaicweb'],
     install_requires = ['SQLAlchemy==1.0.12',
                         'flask==0.11.1',
+                        'flask-login==0.3.2',
+                        'flask-bcrypt==0.7.1',
                         'psycopg2==2.6.1',
                         'prosaic==5.1.0'],
     entry_points = {

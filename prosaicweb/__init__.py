@@ -13,7 +13,60 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from .app import app
+from . import views
+from .views.auth import login, logout, account, register
+from .app import app, bcrypt
+
+routes = [
+    # TODO
+    # because html is dumb and forms can only use post/get, that's all we take
+    # here. However, within each view function, we check for a _method on a
+    # POST and treat that as the method. This should really be handled by a
+    # middleware.
+    ('/', 'index', views.index, {}),
+
+    ('/generate', 'generate', views.generate,
+     {'methods': ['GET', 'POST']}),
+
+    ('/corpora', 'corpora', views.corpora,
+     {'methods': ['GET', 'POST',]}),
+
+    ('/sources', 'sources', views.sources,
+     {'methods': ['GET', 'POST',]}),
+
+    ('/sources/<source_id>', 'source', views.source,
+     {'methods': ['GET', 'POST']}),
+
+    ('/corpora/<corpus_id>', 'corpus', views.corpus,
+     {'methods': ['GET', 'POST']}),
+
+    ('/phrases', 'phrases', views.phrases,
+     {'methods': ['POST']}),
+
+    ('/templates', 'templates', views.templates,
+     {'methods': ['GET', 'POST']}),
+
+    ('/templates/<template_id>', 'template', views.template,
+     {'methods': ['GET', 'POST']}),
+
+    ('/auth/account', 'account', account,
+     {'methods': ['GET', 'POST']}),
+
+    ('/auth/login', 'login', login,
+     {'methods': ['POST']}),
+
+    ('/auth/register', 'register', register,
+     {'methods':['GET', 'POST']}),
+
+    ('/auth/logout', 'logout', logout, {}),
+]
+
+
+for [route, name, fn, opts] in routes:
+    app.add_url_rule(route, name, fn, **opts)
 
 def main():
     app.run()
+
+if __name__ == '__main__':
+    main()

@@ -16,17 +16,15 @@
 import json
 
 from flask import render_template, request, redirect, Response
+from flask_login import login_required, current_user
 from prosaic.parsing import process_text
 from prosaic.generation import poem_from_template
 
 # TODO don't use DEFAULT_DB
 from ..models import Source, Corpus, get_session, DEFAULT_DB, corpora_sources, Phrase, Template
+from ..util import get_method
 
 # TODO types?
-
-def get_method(req) -> str:
-    return req.form.get('_method', req.method)
-
 def index():
     return "main page lulz"
 
@@ -238,9 +236,28 @@ def template(template_id):
         }
         return render_template('template.html', **context)
 
+# TODO i need to do some refactoring. The generate page should not require
+# login -- it will just render the page accordingly. however, all non-get
+# methods do require auth.
 def generate():
-    # TODO auth
     method = get_method(request)
+
+    if method == 'GET':
+        if not current_user.is_authenticated:
+            context = {
+                'authenticated': False,
+            }
+        else:
+            session = get_session(DEFAULT_DB)
+            cs = session.query(Corpus).all()
+            ts = session.query(Template).all()
+            context = {
+                'username': 'vilmibm',
+                'authenticated': True,
+                'corpora': cs,
+                'templates': ts,
+            }
+        return render_template('generate.html', **context)
 
     if method == 'POST':
         session = get_session(DEFAULT_DB)
@@ -268,15 +285,3 @@ def generate():
         }
 
         return json.dumps(result)
-
-    if method == 'GET':
-        session = get_session(DEFAULT_DB)
-        cs = session.query(Corpus).all()
-        ts = session.query(Template).all()
-        context = {
-            'username': 'vilmibm',
-            'authenticated': True,
-            'corpora': cs,
-            'templates': ts,
-        }
-        return render_template('generate.html', **context)

@@ -69,3 +69,14 @@ textarea {
     margin:1em;
     background: rgba(150,0,70,.1);
 }
+
+#register {
+    float:left;
+    width:45%
+}
+
+#login {
+    float:right;
+    width:45%;
+    background-color:rgba(0,0,0,.1);
+}

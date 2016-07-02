@@ -13,146 +13,33 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import json
-import random
+from typing import Optional
 
-from flask import Flask, render_template, request, redirect, jsonify, Response
-from prosaic.generation import poem_from_template
+from flask import Flask
+from flask_login import LoginManager
+from flask_bcrypt import Bcrypt
 
 from .cfg import SITE_NAME, DEBUG, SECRET_KEY, MAX_UPLOAD_SIZE
-from .models import Template, Source, User
-from .storage import get_db
-from . import views
-from .views.auth import session, account
+from .models import User, get_session, DEFAULT_DB
 
-
-# TODO import route functions
-# TODO register each with add_url_rule
-
-"""
-for views, considering:
-    views/__init__.py # default place for views
-    views/auth.py     # login/logout/account stuff
-
-alternatives:
-    * stick everything into views.py (maybe)
-    * put everything here in app.py (no)
-
-I want this file to be a high level look into the app's topography.
-
-for templates:
-    templates/base.html # has auth stuff linked
-    templates/corpora.html
-    templates/sources.html
-    templates/templates.html
-    templates/generate.html
-    templates/account.html # edit account info
-
-notes:
-    * can add new templates from generate page
-    * can add new sources to a (new) corpora from generate page
-
-# the generate flow
-
-The ingredients of poetry generation:
-
-    * choosing a corpora
-    * choosing a template
-    * refining the output
-
-The first two will be confined to the left pane, the final to a right pane.
-
-The base html of the site will have this row at the top:
-
-    | generate | sources | corpora | templates | generate | ... | account
-
-where ... expands to fill available space. each link loads the governing template, which will
-inevitably contain forms that POST etc to edit/add/delete things.
-
-
-routes:
-
-    (PUT: update, POST: new)
-
-    * GET / - static information page
-
-    * GET /generate
-    * POST /generate
-
-    * GET /corpora
-    * POST /corpora
-    * PUT /corpora
-    * DELETE /corpora
-
-    * GET /sources
-    * POST /sources
-    * DELETE /sources
-    * PUT /sources
-
-    * GET /templates
-    * POST /templates
-    * DELETE /templates
-    * PUT /templates
-
-    * GET /auth/account    - account info page
-    * GET /auth/account/create - create account page
-    * POST /auth/account   - create new accoutn
-    * PUT /auth/account    - update account
-    * DELETE /auth/account - delete account
-    * POST /auth/session   - login
-    * DELETE /auth/session - logout
-
-"""
-
-SYSTEM_USER = 'sigh' # TODO no
 app = Flask('prosaicweb')
+login_manager = LoginManager()
+login_manager.init_app(app)
+bcrypt = Bcrypt(app)
 
 app.config['DEBUG'] = DEBUG
 app.config['SECRET_KEY'] = SECRET_KEY
 app.config['MAX_CONTENT_LENGTH'] = MAX_UPLOAD_SIZE
 
-routes = [
+@login_manager.user_loader
+def load_user(email: str) -> Optional[User]:
+    session = get_session(DEFAULT_DB)
+    users = session.query(User).filter(User.email == email).all()
 
-    # TODO
-    # because html is dumb and forms can only use post/get, that's all we take
-    # here. However, within each view function, we check for a _method on a
-    # POST and treat that as the method. This should really be handled by a
-    # middleware.
-    ('/', 'index', views.index, {}),
+    if len(users) == 0:
+        return None
 
-    ('/generate', 'generate', views.generate,
-     {'methods': ['GET', 'POST']}),
+    if len(users)  > 1:
+        return None
 
-    ('/corpora', 'corpora', views.corpora,
-     {'methods': ['GET', 'POST',]}),
-
-    ('/sources', 'sources', views.sources,
-     {'methods': ['GET', 'POST',]}),
-
-    ('/sources/<source_id>', 'source', views.source,
-     {'methods': ['GET', 'POST']}),
-
-    ('/corpora/<corpus_id>', 'corpus', views.corpus,
-     {'methods': ['GET', 'POST']}),
-
-    ('/phrases', 'phrases', views.phrases,
-     {'methods': ['POST']}),
-
-    ('/templates', 'templates', views.templates,
-     {'methods': ['GET', 'POST']}),
-
-    ('/templates/<template_id>', 'template', views.template,
-     {'methods': ['GET', 'POST']}),
-
-    ('/auth/account', 'account', account,
-     {'methods': ['GET', 'POST']}),
-
-    ('/auth/session', 'session', session,
-     {'methods': ['POST']}),
-]
-
-
-for [route, name, fn, opts] in routes:
-    app.add_url_rule(route, name, fn, **opts)
-
-if __name__ == '__main__': app.run()
+    return users[0]

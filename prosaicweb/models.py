@@ -16,6 +16,7 @@
 import json
 from functools import lru_cache
 
+from flask_login import UserMixin
 from prosaic.models import Base, Source, Corpus, Phrase, corpora_sources
 from prosaic.parsing import process_text
 from sqlalchemy import create_engine, Column, Boolean, ForeignKey, Table
@@ -97,7 +98,7 @@ class Template(Base):
     def __repr__(self) -> str:
         return "Template<'{}'>".format(self.lines)
 
-class User(Base):
+class User(Base, UserMixin):
     __tablename__ = 'users'
 
     id = Column(INTEGER, primary_key=True)
@@ -108,6 +109,9 @@ class User(Base):
     sources = relationship('Source', secondary=users_sources)
     corpora = relationship('Corpus', secondary=users_corpora)
     templates = relationship('Template', secondary=users_templates)
+
+    def get_id(self) -> str:
+        return self.email
 
     def __repr__(self) -> str:
         return "User(username='{}', email='{}', pwhash='{}')".format(
