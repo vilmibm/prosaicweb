@@ -38,8 +38,9 @@ def login():
         password = request.form['password']
 
         user = session.query(User).filter(User.email == email).one()
+        pwhash = bytes(user.pwhash, 'utf-8')
 
-        if not bcrypt.check_password_hash(user.pwhash, password):
+        if not bcrypt.check_password_hash(pwhash, password):
             return redirect('/auth/login')
 
         login_user(user, remember=True)
@@ -48,14 +49,13 @@ def login():
 
 def register():
     if request.method == 'GET':
-        return render_template('/register.html', )
+        return render_template('/register.html')
 
     if request.method == 'POST':
-        # TODO unique user columns
         session = get_session(DEFAULT_DB)
         email = request.form['email']
         password = request.form['password']
-        pwhash = bcrypt.generate_password_hash(password)
+        pwhash = bcrypt.generate_password_hash(password).decode()
         user = User(email=email, pwhash=pwhash)
 
         session.add(user)

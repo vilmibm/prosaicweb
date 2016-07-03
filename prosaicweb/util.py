@@ -22,6 +22,6 @@ def get_method(req) -> str:
 
 def auth_context(req) -> Dict:
     return {
-        'authenticated': current_user,
+        'authenticated': current_user.is_authenticated,
         'user': current_user
     }

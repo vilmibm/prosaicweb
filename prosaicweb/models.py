@@ -105,6 +105,7 @@ class User(Base, UserMixin):
     pwhash = Column(TEXT, nullable=False)
     email = Column(TEXT, nullable=False, unique=True)
 
+    # TODO check on table encoding, make sure it's utf-8
     sources = relationship('Source', secondary=users_sources)
     corpora = relationship('Corpus', secondary=users_corpora)
     templates = relationship('Template', secondary=users_templates)
@@ -113,5 +114,6 @@ class User(Base, UserMixin):
         return self.email
 
     def __repr__(self) -> str:
-        return "User(username='{}', email='{}', pwhash='{}')".format(
-            self.username, self.email, self.pwhash)
+        return "User(email='{}', pwhash='{}')".format(
+            self.email, self.pwhash
+        )
