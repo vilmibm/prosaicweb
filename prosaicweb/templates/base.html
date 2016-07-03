@@ -16,7 +16,7 @@
 
         <span class="tab right">
           {% if authenticated %}
-          logged in as <a href="/auth/account">{{ username }}</a>
+          logged in as <a href="/auth/account">{{ user.email }}</a>
           | <a href="/auth/logout"><button>log out</button></a>
           {% else %}
           <form action="/auth/login" method="POST">

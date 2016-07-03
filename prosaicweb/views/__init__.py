@@ -22,7 +22,9 @@ from prosaic.generation import poem_from_template
 
 # TODO don't use DEFAULT_DB
 from ..models import Source, Corpus, get_session, DEFAULT_DB, corpora_sources, Phrase, Template
-from ..util import get_method
+from ..util import get_method, auth_context
+
+UNAUTHORIZED = Response(status=401)
 
 # TODO types?
 def index():
@@ -30,13 +32,13 @@ def index():
 
 def corpora():
     method = get_method(request)
-    # TODO block on auth
+    context = auth_context(request)
+
     if method == 'GET':
-        session = get_session(DEFAULT_DB)
-        context = {'corpora': session.query(Corpus).all(),
-                   'sources': session.query(Source).all(),
-                   'authenticated': True,
-                   'username': 'vilmibm'}
+        if context['authenticated']:
+            session = get_session(DEFAULT_DB)
+            context.update({'corpora': session.query(Corpus).all(),
+                            'sources': session.query(Source).all(),})
         return render_template('corpora.html', **context)
 
     if method == 'POST':
@@ -53,22 +55,25 @@ def corpora():
 
 def corpus(corpus_id):
     method = get_method(request)
+    context = auth_context(request)
 
     if method == 'GET':
-        session = get_session(DEFAULT_DB)
-        c = session.query(Corpus).filter(Corpus.id == corpus_id).one()
-        source_ids = map(lambda s: s.id, c.sources)
+        if context['authenticated']:
+            session = get_session(DEFAULT_DB)
+            c = session.query(Corpus).filter(Corpus.id == corpus_id).one()
+            source_ids = map(lambda s: s.id, c.sources)
 
-        other_sources = session.query(Source)\
-                        .filter(Source.id.notin_(source_ids))\
-                        .all()
-        context = {
-            'corpus': c,
-            'other_sources': other_sources,
-            'authenticated':True,
-            'username':'vilmibm',
-        }
+            other_sources = session.query(Source)\
+                                   .filter(Source.id.notin_(source_ids))\
+                                   .all()
+            context.update({
+                'corpus': c,
+                'other_sources': other_sources,
+            })
         return render_template('corpus.html', **context)
+
+    if not context['authenticated']:
+        return UNAUTHORIZED
 
     if method == 'PUT':
         session = get_session(DEFAULT_DB)
@@ -93,16 +98,20 @@ def corpus(corpus_id):
 
 def sources():
     method = get_method(request)
-    # TODO block on auth
+    context = auth_context(request)
+
     if method == 'GET':
-        session = get_session(DEFAULT_DB)
-        sources = session.query(Source).all()
-        for source in sources:
-            source.content_preview = source.content[0:250] + '...'
-        context = {'sources':sources,
-                   'authenticated':True,
-                   'username': 'vilmibm'}
+        if context['authenticated']:
+            session = get_session(DEFAULT_DB)
+            sources = session.query(Source).all()
+            for source in sources:
+                source.content_preview = source.content[0:250] + '...'
+            context.update({'sources':sources})
+
         return render_template('sources.html', **context)
+
+    if not context['authenticated']:
+        return UNAUTHORIZED
 
     if method == 'POST':
         session = get_session(DEFAULT_DB)
@@ -126,20 +135,23 @@ def sources():
 
 def source(source_id):
     method = request.form.get('_method', request.method)
+    context = auth_context(request)
 
     if method == 'GET':
-        session = get_session(DEFAULT_DB)
-        s = session.query(Source).filter(Source.id == source_id).one()
-        # TODO get this phrase's sources and put em in a table
-        context = {
-            'source':s,
-            'authenticated':True,
-            'username':'vilmibm',
-        }
+        if context['authenticated']:
+            session = get_session(DEFAULT_DB)
+            s = session.query(Source).filter(Source.id == source_id).one()
+            context.update({
+                'source':s,
+            })
         return render_template('source.html', **context)
 
+    if not context['authenticated']:
+        return UNAUTHORIZED
+
+    session = get_session(DEFAULT_DB)
+
     if method == 'PUT':
-        session = get_session(DEFAULT_DB)
         s = session.query(Source).filter(Source.id == source_id).one()
         s.name = request.form['source_name']
         s.description = request.form['source_description']
@@ -153,7 +165,6 @@ def source(source_id):
 
     if method == 'DELETE':
         # TODO for love of god get on delete cascade working
-        session = get_session(DEFAULT_DB)
         s = session.query(Source).filter(Source.id==source_id).one()
         corpus_ids = session.query(corpora_sources.c.corpus_id).filter(
             corpora_sources.c.source_id == source_id
@@ -166,10 +177,9 @@ def source(source_id):
 
         return redirect('/sources')
 
+@login_required
 def phrases():
-    # TODO auth
     method = get_method(request)
-
     if method == 'DELETE':
         session = get_session(DEFAULT_DB)
         s = session.query(Source)\
@@ -186,8 +196,20 @@ def phrases():
         return redirect('/sources/{}'.format(s.id))
 
 def templates():
-    # TODO auth
     method = get_method(request)
+    context = auth_context(request)
+
+    if method == 'GET':
+        if context['authenticated']:
+            session = get_session(DEFAULT_DB)
+            ts = session.query(Template).all()
+            context.update({
+                'templates': ts,
+            })
+        return render_template('templates.html', **context)
+
+    if not context['authenticated']:
+        return UNAUTHORIZED
 
     if method == 'POST':
         session = get_session(DEFAULT_DB)
@@ -197,22 +219,25 @@ def templates():
         session.commit()
         return redirect('/templates/{}'.format(t.id))
 
-    if method == 'GET':
-        session = get_session(DEFAULT_DB)
-        ts = session.query(Template).all()
-        context = {
-            'username': 'vilmibm',
-            'authenticated': True,
-            'templates': ts,
-        }
-        return render_template('templates.html', **context)
-
 def template(template_id):
-    # TODO auth
     method = get_method(request)
+    context = auth_context(request)
 
+    if method == 'GET':
+        if context['authenticated']:
+            session = get_session(DEFAULT_DB)
+            t = session.query(Template).filter(Template.id == template_id).one()
+            context.update({
+                'template': t,
+            })
+
+        return render_template('template.html', **context)
+
+    if not context['authenticated']:
+        return UNAUTHORIZED
+
+    session = get_session(DEFAULT_DB)
     if method == 'PUT':
-        session = get_session(DEFAULT_DB)
         t = session.query(Template).filter(Template.id == template_id).one()
         t.name = request.form['template_name']
         t.lines = json.loads(request.form['template_json'])
@@ -221,43 +246,30 @@ def template(template_id):
         return redirect('/templates/{}'.format(template_id))
 
     if method == 'DELETE':
-        session = get_session(DEFAULT_DB)
         session.query(Template).filter(Template.id == template_id).delete()
         session.commit()
         return redirect('/templates')
-
-    if method == 'GET':
-        session = get_session(DEFAULT_DB)
-        t = session.query(Template).filter(Template.id == template_id).one()
-        context = {
-            'username': 'vilmibm',
-            'authenticated': True,
-            'template': t,
-        }
-        return render_template('template.html', **context)
 
 # TODO i need to do some refactoring. The generate page should not require
 # login -- it will just render the page accordingly. however, all non-get
 # methods do require auth.
 def generate():
     method = get_method(request)
+    context = auth_context(request)
 
     if method == 'GET':
-        if not current_user.is_authenticated:
-            context = {
-                'authenticated': False,
-            }
-        else:
+        if context['authenticated']:
             session = get_session(DEFAULT_DB)
             cs = session.query(Corpus).all()
             ts = session.query(Template).all()
-            context = {
-                'username': 'vilmibm',
-                'authenticated': True,
+            context.update({
                 'corpora': cs,
                 'templates': ts,
-            }
+            })
         return render_template('generate.html', **context)
+
+    if not context['authenticated']:
+        return UNAUTHORIZED
 
     if method == 'POST':
         session = get_session(DEFAULT_DB)

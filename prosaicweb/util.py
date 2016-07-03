@@ -13,6 +13,15 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from typing import Dict
+
+from flask_login import current_user
 
 def get_method(req) -> str:
     return req.form.get('_method', req.method)
+
+def auth_context(req) -> Dict:
+    return {
+        'authenticated': current_user,
+        'user': current_user
+    }

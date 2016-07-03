@@ -102,9 +102,8 @@ class User(Base, UserMixin):
     __tablename__ = 'users'
 
     id = Column(INTEGER, primary_key=True)
-    username = Column(TEXT, nullable=False)
     pwhash = Column(TEXT, nullable=False)
-    email = Column(TEXT, nullable=False)
+    email = Column(TEXT, nullable=False, unique=True)
 
     sources = relationship('Source', secondary=users_sources)
     corpora = relationship('Corpus', secondary=users_corpora)
