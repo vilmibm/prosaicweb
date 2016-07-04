@@ -3,7 +3,7 @@
     <head>
         <link rel="stylesheet" href="/static/main.css">
         {% block head %}
-        <title>prosaic web</title>
+        <title>PROSAIC PARTY</title>
         {% endblock %}
         <script src="/static/prosaicweb.js"></script>
     </head>
@@ -16,7 +16,7 @@
 
         <span class="tab right">
           {% if authenticated %}
-          logged in as <a href="/auth/account">{{ user.email }}</a>
+          logged in as <strong>{{ user.email }}</strong>
           | <a href="/auth/logout"><button>log out</button></a>
           {% else %}
           <form action="/auth/login" method="POST">
@@ -28,10 +28,11 @@
           {% endif %}
         </span>
       </div>
-      {% if authenticated %}
-      {% block content %}{% endblock %}
-      {% else %}
-      please login :)
-      {% endif %}
+      {% block content %}
+      <h1>welcome to prosaic.party</h1>
+      <p>this is a web front-end
+        to <a href="https://github.com/nathanielksmith/prosaic">prosaic</a>, a
+        tool for creating cut-up poetry from large collections of texts.</p>
+      {% endblock %}
     </body>
 </html>

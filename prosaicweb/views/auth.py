@@ -22,11 +22,6 @@ from ..models import User, get_session, DEFAULT_DB
 from ..util import get_method
 
 @login_required
-def account():
-    method = get_method(request)
-    return 'lol'
-
-@login_required
 def logout():
     logout_user()
     return redirect('/')

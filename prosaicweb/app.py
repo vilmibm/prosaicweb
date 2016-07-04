@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from typing import Optional
 
-from flask import Flask
+from flask import Flask, redirect, url_for
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 
@@ -30,6 +30,10 @@ bcrypt = Bcrypt(app)
 app.config['DEBUG'] = DEBUG
 app.config['SECRET_KEY'] = SECRET_KEY
 app.config['MAX_CONTENT_LENGTH'] = MAX_UPLOAD_SIZE
+
+@login_manager.unauthorized_handler
+def unauthorized():
+    return redirect(url_for('index'))
 
 @login_manager.user_loader
 def load_user(email: str) -> Optional[User]:
