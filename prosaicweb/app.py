@@ -21,6 +21,7 @@ from flask_bcrypt import Bcrypt
 
 from .cfg import SITE_NAME, DEBUG, SECRET_KEY, MAX_UPLOAD_SIZE
 from .models import User, get_session, DEFAULT_DB
+from .util import ResponseData
 
 app = Flask('prosaicweb')
 login_manager = LoginManager()
@@ -32,7 +33,7 @@ app.config['SECRET_KEY'] = SECRET_KEY
 app.config['MAX_CONTENT_LENGTH'] = MAX_UPLOAD_SIZE
 
 @login_manager.unauthorized_handler
-def unauthorized():
+def unauthorized() -> ResponseData:
     return redirect(url_for('index'))
 
 @login_manager.user_loader

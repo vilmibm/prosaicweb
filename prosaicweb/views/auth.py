@@ -19,14 +19,14 @@ from flask_login import login_user, logout_user, login_required
 
 from ..app import bcrypt
 from ..models import User, get_session, DEFAULT_DB
-from ..util import get_method
+from ..util import get_method, ResponseData
 
 @login_required
-def logout():
+def logout() -> ResponseData:
     logout_user()
     return redirect('/')
 
-def login():
+def login() -> ResponseData:
     if request.method == 'POST':
         session = get_session(DEFAULT_DB)
         email = request.form['email']
@@ -42,7 +42,7 @@ def login():
 
         return redirect('/generate')
 
-def register():
+def register() -> ResponseData:
     if request.method == 'GET':
         return render_template('/register.html')
 

@@ -13,14 +13,20 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from typing import Dict
+from typing import Dict, Union
 
+from flask import Response
 from flask_login import current_user
+from werkzeug.local import LocalProxy
 
-def get_method(req) -> str:
+ResponseData = Union[str, Response]
+# TODO this is not good:
+Request = LocalProxy
+
+def get_method(req: Request) -> str:
     return req.form.get('_method', req.method)
 
-def auth_context(req) -> Dict:
+def auth_context(req: Request) -> Dict:
     return {
         'authenticated': current_user.is_authenticated,
         'user': current_user

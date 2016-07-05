@@ -16,22 +16,19 @@
 import json
 
 from flask import render_template, request, redirect, Response
-from flask_login import login_required, current_user
+from flask_login import login_required
 from prosaic.parsing import process_text
 from prosaic.generation import poem_from_template
 
 # TODO don't use DEFAULT_DB
 from ..models import Source, Corpus, get_session, DEFAULT_DB, corpora_sources, Phrase, Template
-from ..util import get_method, auth_context
+from ..util import get_method, auth_context, ResponseData
 
-UNAUTHORIZED = Response(status=401)
-
-# TODO types?
-def index():
+def index() -> ResponseData:
     return render_template('index.html', **auth_context(request))
 
 @login_required
-def corpora():
+def corpora() -> ResponseData:
     method = get_method(request)
     session = get_session(DEFAULT_DB)
 
@@ -53,7 +50,7 @@ def corpora():
         return redirect('corpora/{}'.format(c.id))
 
 @login_required
-def corpus(corpus_id):
+def corpus(corpus_id: str) -> ResponseData:
     method = get_method(request)
     session = get_session(DEFAULT_DB)
 
@@ -91,7 +88,7 @@ def corpus(corpus_id):
         return redirect('/corpora')
 
 @login_required
-def sources():
+def sources() -> ResponseData:
     method = get_method(request)
     session = get_session(DEFAULT_DB)
 
@@ -124,7 +121,7 @@ def sources():
         return redirect('/sources/{}'.format(s.id))
 
 @login_required
-def source(source_id):
+def source(source_id: str) -> ResponseData:
     method = request.form.get('_method', request.method)
     session = get_session(DEFAULT_DB)
 
@@ -163,7 +160,7 @@ def source(source_id):
         return redirect('/sources')
 
 @login_required
-def phrases():
+def phrases() -> ResponseData:
     method = get_method(request)
     session = get_session(DEFAULT_DB)
 
@@ -182,7 +179,7 @@ def phrases():
         return redirect('/sources/{}'.format(s.id))
 
 @login_required
-def templates():
+def templates() -> ResponseData:
     method = get_method(request)
     session = get_session(DEFAULT_DB)
 
@@ -202,7 +199,7 @@ def templates():
         return redirect('/templates/{}'.format(t.id))
 
 @login_required
-def template(template_id):
+def template(template_id: str) -> ResponseData:
     method = get_method(request)
     session = get_session(DEFAULT_DB)
 
@@ -229,7 +226,7 @@ def template(template_id):
         return redirect('/templates')
 
 @login_required
-def generate():
+def generate() -> ResponseData:
     method = get_method(request)
     session = get_session(DEFAULT_DB)
 
@@ -241,6 +238,7 @@ def generate():
             'corpora': cs,
             'templates': ts,
         })
+
         return render_template('generate.html', **context)
 
     if method == 'POST':

@@ -43,7 +43,7 @@ routes = [
 for [route, name, fn, opts] in routes:
     app.add_url_rule(route, name, fn, **opts)
 
-def main():
+def main() -> None:
     app.run()
 
 if __name__ == '__main__':
