@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from flask import request, redirect, render_template
+from flask import request, redirect, render_template, url_for
 from flask_login import login_user, logout_user, login_required
 
 from ..app import bcrypt, app
@@ -24,7 +24,7 @@ from ..util import get_method, ResponseData
 @login_required
 def logout() -> ResponseData:
     logout_user()
-    return redirect('/')
+    return redirect(url_for('index'))
 
 def login() -> ResponseData:
     if request.method == 'POST':
@@ -40,7 +40,7 @@ def login() -> ResponseData:
 
         login_user(user, remember=True)
 
-        return redirect('/generate')
+        return redirect(url_for('generate'))
 
 def register() -> ResponseData:
     if request.method == 'GET':
@@ -58,4 +58,4 @@ def register() -> ResponseData:
 
         login_user(user, remember=True)
 
-        return redirect('/generate')
+        return redirect(url_for('generate'))

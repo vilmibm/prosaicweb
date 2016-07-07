@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import json
 
-from flask import render_template, request, redirect, Response
+from flask import render_template, request, redirect, Response, url_for
 from flask_login import login_required
 from prosaic.parsing import process_text
 from prosaic.generation import poem_from_template
@@ -47,7 +47,7 @@ def corpora() -> ResponseData:
             c.sources.append(s)
         session.add(c)
         session.commit()
-        return redirect('corpora/{}'.format(c.id))
+        return redirect(url_for('corpus', corpus_id=c.id))
 
 @login_required
 def corpus(corpus_id: str) -> ResponseData:
@@ -76,7 +76,7 @@ def corpus(corpus_id: str) -> ResponseData:
         c.sources = session.query(Source).filter(Source.id.in_(source_ids)).all()
         session.commit()
 
-        return redirect('/corpora')
+        return redirect(url_for('corpora'))
 
     if method == 'DELETE':
         c = session.query(Corpus).filter(Corpus.id == corpus_id).one()
@@ -85,7 +85,7 @@ def corpus(corpus_id: str) -> ResponseData:
         session.query(Corpus).filter(Corpus.id == corpus_id).delete()
         session.commit()
 
-        return redirect('/corpora')
+        return redirect(url_for('corpora'))
 
 @login_required
 def sources() -> ResponseData:
@@ -112,13 +112,14 @@ def sources() -> ResponseData:
             content = str(request.files['content_file'].read())
 
         if len(content) == 0:
+            # TODO go back to /sources with a flash
             return Response('Got empty content for source.', 400)
 
         session.add(s)
         process_text(s, content)
         session.commit()
 
-        return redirect('/sources/{}'.format(s.id))
+        return redirect(url_for('source', source_id=s.id))
 
 @login_required
 def source(source_id: str) -> ResponseData:
@@ -143,7 +144,7 @@ def source(source_id: str) -> ResponseData:
             process_text(s, new_content)
         session.commit()
 
-        return redirect('/sources')
+        return redirect(url_for('sources'))
 
     if method == 'DELETE':
         # TODO for love of god get on delete cascade working
@@ -157,7 +158,7 @@ def source(source_id: str) -> ResponseData:
         session.query(Source).filter(Source.id == source_id).delete()
         session.commit()
 
-        return redirect('/sources')
+        return redirect(url_for('sources'))
 
 @login_required
 def phrases() -> ResponseData:
@@ -176,7 +177,7 @@ def phrases() -> ResponseData:
 
         session.commit()
 
-        return redirect('/sources/{}'.format(s.id))
+        return redirect(url_for('source', source_id=s.id))
 
 @login_required
 def templates() -> ResponseData:
@@ -196,7 +197,7 @@ def templates() -> ResponseData:
                      lines=json.loads(request.form['template_json']))
         session.add(t)
         session.commit()
-        return redirect('/templates/{}'.format(t.id))
+        return redirect(url_for('template', template_id=t.id))
 
 @login_required
 def template(template_id: str) -> ResponseData:
@@ -218,12 +219,12 @@ def template(template_id: str) -> ResponseData:
         t.lines = json.loads(request.form['template_json'])
         session.add(t)
         session.commit()
-        return redirect('/templates/{}'.format(template_id))
+        return redirect(url_for('template', template_id=template_id))
 
     if method == 'DELETE':
         session.query(Template).filter(Template.id == template_id).delete()
         session.commit()
-        return redirect('/templates')
+        return redirect(url_for('templates'))
 
 @login_required
 def generate() -> ResponseData:
