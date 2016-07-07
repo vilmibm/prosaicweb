@@ -20,8 +20,8 @@ from flask_login import login_required
 from prosaic.parsing import process_text
 from prosaic.generation import poem_from_template
 
-# TODO don't use DEFAULT_DB
-from ..models import Source, Corpus, get_session, DEFAULT_DB, corpora_sources, Phrase, Template
+from ..app import app
+from ..models import Source, Corpus, get_session, corpora_sources, Phrase, Template
 from ..util import get_method, auth_context, ResponseData
 
 def index() -> ResponseData:
@@ -30,7 +30,7 @@ def index() -> ResponseData:
 @login_required
 def corpora() -> ResponseData:
     method = get_method(request)
-    session = get_session(DEFAULT_DB)
+    session = get_session(app.config['DB'])
 
     if method == 'GET':
         context = auth_context(request)
@@ -52,7 +52,7 @@ def corpora() -> ResponseData:
 @login_required
 def corpus(corpus_id: str) -> ResponseData:
     method = get_method(request)
-    session = get_session(DEFAULT_DB)
+    session = get_session(app.config['DB'])
 
     if method == 'GET':
         context = auth_context(request)
@@ -90,7 +90,7 @@ def corpus(corpus_id: str) -> ResponseData:
 @login_required
 def sources() -> ResponseData:
     method = get_method(request)
-    session = get_session(DEFAULT_DB)
+    session = get_session(app.config['DB'])
 
     if method == 'GET':
         context = auth_context(request)
@@ -123,7 +123,7 @@ def sources() -> ResponseData:
 @login_required
 def source(source_id: str) -> ResponseData:
     method = request.form.get('_method', request.method)
-    session = get_session(DEFAULT_DB)
+    session = get_session(app.config['DB'])
 
     if method == 'GET':
         context = auth_context(request)
@@ -162,7 +162,7 @@ def source(source_id: str) -> ResponseData:
 @login_required
 def phrases() -> ResponseData:
     method = get_method(request)
-    session = get_session(DEFAULT_DB)
+    session = get_session(app.config['DB'])
 
     if method == 'DELETE':
         s = session.query(Source)\
@@ -181,7 +181,7 @@ def phrases() -> ResponseData:
 @login_required
 def templates() -> ResponseData:
     method = get_method(request)
-    session = get_session(DEFAULT_DB)
+    session = get_session(app.config['DB'])
 
     if method == 'GET':
         context = auth_context(request)
@@ -201,7 +201,7 @@ def templates() -> ResponseData:
 @login_required
 def template(template_id: str) -> ResponseData:
     method = get_method(request)
-    session = get_session(DEFAULT_DB)
+    session = get_session(app.config['DB'])
 
     if method == 'GET':
         context = auth_context(request)
@@ -228,7 +228,7 @@ def template(template_id: str) -> ResponseData:
 @login_required
 def generate() -> ResponseData:
     method = get_method(request)
-    session = get_session(DEFAULT_DB)
+    session = get_session(app.config['DB'])
 
     if method == 'GET':
         context = auth_context(request)
@@ -247,7 +247,7 @@ def generate() -> ResponseData:
                              .filter(Corpus.id==corpus_id)\
                              .one()[0]
         t = json.loads(request.form['template_tweak'])
-        poem = poem_from_template(t, DEFAULT_DB, corpus_id)
+        poem = poem_from_template(t, app.config['DB'], corpus_id)
         source_ids = set(map(lambda p: p[1], poem))
         get_source_name = lambda sid:\
                           session.query(Source.name).filter(Source.id==sid).one()[0]

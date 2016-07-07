@@ -17,7 +17,7 @@ import json
 from functools import lru_cache
 
 from flask_login import UserMixin
-from prosaic.models import Base, Source, Corpus, Phrase, corpora_sources
+from prosaic.models import Base, Source, Corpus, Phrase, corpora_sources, Database
 from prosaic.parsing import process_text
 from sqlalchemy import create_engine, Column, Boolean, ForeignKey, Table
 from sqlalchemy.orm import relationship, sessionmaker
@@ -25,33 +25,6 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.dialects.postgresql import ARRAY, TEXT, INTEGER, JSON
 from sqlalchemy.ext.declarative import declarative_base
 from werkzeug.security import generate_password_hash, check_password_hash
-
-class Database(dict):
-    def __init__(self, user='prosaic', password='prosaic', host='localhost',
-                 port=5432, dbname='prosaic'):
-        self._data = dict(user=user, password=password, port=port,
-                          host=host, dbname=dbname)
-
-    def __getattr__(self, k: str) -> str:
-        return self[k]
-
-    def __getitem__(self, k: str) -> str:
-        return self._data[k]
-
-    def _fmt(self) -> str:
-        return ';'.join(sorted(map(str, self._data.values())))
-
-    def __hash__(self) -> int:
-        return hash(self._fmt())
-
-    def __repr__(self) -> str:
-        return self._fmt()
-
-DEFAULT_DB = Database(**{'user': 'prosaic',
-                  'password': 'prosaic',
-                  'host': '127.0.0.1',
-                  'port': 5432,
-                  'dbname': 'prosaic'})
 
 @lru_cache(maxsize=128)
 def get_engine(db: Database) -> Engine:
