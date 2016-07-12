@@ -5,6 +5,15 @@
     <link rel="stylesheet" href="/static/main.css">
   </head>
   <body>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+      <p id="messages">
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+      </p>
+      {% endif %}
+    {% endwith %}
     <h1>login to prosaic.party</h1>
     <div id="register">
       <h2>new user? register:</h2>

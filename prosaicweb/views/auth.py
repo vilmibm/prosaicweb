@@ -14,12 +14,14 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from flask import request, redirect, render_template, url_for
+from flask import request, redirect, render_template, url_for, flash
 from flask_login import login_user, logout_user, login_required
 
 from ..app import bcrypt, app
 from ..models import User, get_session
 from ..util import get_method, ResponseData
+
+BAD_CREDS_MSG = 'no such user or bad password'
 
 @login_required
 def logout() -> ResponseData:
@@ -32,11 +34,15 @@ def login() -> ResponseData:
         email = request.form['email']
         password = request.form['password']
 
-        user = session.query(User).filter(User.email == email).one()
+        user = session.query(User).filter(User.email == email).one_or_none()
+        if user is None:
+            flash(BAD_CREDS_MSG)
+            return redirect(url_for('register'))
         pwhash = bytes(user.pwhash, 'utf-8')
 
         if not bcrypt.check_password_hash(pwhash, password):
-            return redirect('/auth/login')
+            flash(BAD_CREDS_MSG)
+            return redirect(url_for('register'))
 
         login_user(user, remember=True)
 

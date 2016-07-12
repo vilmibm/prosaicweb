@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from typing import Optional
 
-from flask import Flask, redirect, url_for
+from flask import Flask, redirect, url_for, flash
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 
@@ -35,6 +35,7 @@ app.config['DB'] = Database(**DB)
 
 @login_manager.unauthorized_handler
 def unauthorized() -> ResponseData:
+    flash('please login to do stuff.')
     return redirect(url_for('index'))
 
 @login_manager.user_loader

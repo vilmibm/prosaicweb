@@ -28,6 +28,15 @@
           {% endif %}
         </span>
       </div>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <p id="messages">
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+        </p>
+        {% endif %}
+      {% endwith %}
       {% block content %}
       <h1>welcome to prosaic.party</h1>
       <p>this is a web front-end
