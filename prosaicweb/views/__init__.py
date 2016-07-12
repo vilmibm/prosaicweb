@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import json
 
-from flask import render_template, request, redirect, Response, url_for
+from flask import render_template, request, redirect, Response, url_for, flash
 from flask_login import login_required
 from prosaic.parsing import process_text
 from prosaic.generation import poem_from_template
@@ -112,8 +112,8 @@ def sources() -> ResponseData:
             content = str(request.files['content_file'].read())
 
         if len(content) == 0:
-            # TODO go back to /sources with a flash
-            return Response('Got empty content for source.', 400)
+            flash('Got empty content for source.')
+            return redirect(url_for('sources'))
 
         session.add(s)
         process_text(s, content)
@@ -176,6 +176,8 @@ def phrases() -> ResponseData:
         s.content = ' '.join(map(lambda p: p.raw, s.phrases))
 
         session.commit()
+
+        flash('selected phrases have been deleted')
 
         return redirect(url_for('source', source_id=s.id))
 
