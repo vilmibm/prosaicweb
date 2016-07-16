@@ -13,7 +13,10 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import sys
+
 from . import views
+from .models import Base
 from .views.auth import login, logout,  register
 from .app import app, bcrypt
 
@@ -47,4 +50,9 @@ def main() -> None:
     app.run()
 
 if __name__ == '__main__':
+    if len(sys.argv) > 1 and sys.argv[1] == 'dbinit':
+        print('initializing prosaic and prosaicweb database state...')
+        Base.metadata.create_all()
+        exit(0)
+
     main()

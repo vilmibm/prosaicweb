@@ -19,7 +19,7 @@ from flask import Flask, redirect, url_for, flash
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 
-from .cfg import SITE_NAME, DEBUG, SECRET_KEY, MAX_UPLOAD_SIZE, DB
+from .cfg import DEBUG, SECRET_KEY, MAX_UPLOAD_SIZE, DB
 from .models import User, get_session, Database
 from .util import ResponseData
 
