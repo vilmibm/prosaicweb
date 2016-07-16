@@ -50,7 +50,7 @@ for [route, name, fn, opts] in routes:
 def main() -> None:
     if len(sys.argv) > 1 and sys.argv[1] == 'dbinit':
         print('initializing prosaic and prosaicweb database state...')
-        Base.metadata.create_all(bind=get_engine(Database(**DB))
+        Base.metadata.create_all(bind=get_engine(Database(**DB)))
         exit(0)
 
     app.run()
