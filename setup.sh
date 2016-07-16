@@ -1,5 +1,8 @@
+#!/bin/bash
 # This file is 90% documentation; but if run on a clean system, it should set up
 # everything needed for prosaicweb.
+
+set -x
 
 echo "installing packages..."
 sudo apt-get update
@@ -25,7 +28,7 @@ python3 -mvenv ~/venv/prosaicweb
 source ~/venv/prosaicweb/bin/activate
 
 echo "installing prosaicweb"
-python setup.py install -e .
+pip install -e .
 
 echo "initializing db tables"
 prosaicweb dbinit

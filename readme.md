@@ -13,26 +13,30 @@ _being a web frontend to [prosaic](https://github.com/nathanielksmith/prosaic)_.
 ## installation / deploy
 
 ```bash
-    # get code
-    git clone https://github.com/nathanielksmith/prosaicweb
-    cd prosaicweb/prosaicweb
+# get code
+git clone https://github.com/nathanielksmith/prosaicweb
+cd prosaicweb/prosaicweb
 
-    # edit cfg.py and set the secret key
-    cp example.cfg.py cfg.py
+# edit cfg.py and set the secret key
+cp example.cfg.py cfg.py
 
-    # srsly read/review what this is going to do :)
-    cd ..
-    cat setup.sh
-    bash setup.sh
+# srsly read/review what this is going to do :)
+cd ..
+cat setup.sh
+bash setup.sh
 
-    # run it at port :8000 with gunicorn
-    bash run.sh
+# run it at port 8000 with gunicorn
+bash run.sh
 
 ```
 
 ## changelog
 
 * 1.0.0 - kick that old shit to the curb
+ * now uses postgresql
+ * manages corpora, sources, and phrases
+ * better management of user stuff
+ * new ui
 * 0.0.2 - make it work on webkit, support site_name
 * 0.0.1 - initial release. user accounts, upload, template editing, corpus mixing.
 
