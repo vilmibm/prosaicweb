@@ -2,10 +2,12 @@
 
 _being a web frontend to [prosaic](https://github.com/nathanielksmith/prosaic)_.
 
-## requirements
+## prereqs
 
 * python >= 3.5.1
 * recent debian / ubuntu
+* postgresql >= 9.0
+* some build helpers (see `setup.sh`)
 * (optional) nginx for reverse proxying to gunicorn
 
 ## installation / deploy
@@ -19,6 +21,7 @@ _being a web frontend to [prosaic](https://github.com/nathanielksmith/prosaic)_.
     cp example.cfg.py cfg.py
 
     # srsly read/review what this is going to do :)
+    cd ..
     cat setup.sh
     bash setup.sh
 
@@ -26,12 +29,6 @@ _being a web frontend to [prosaic](https://github.com/nathanielksmith/prosaic)_.
     bash run.sh
 
 ```
-
-    # install initial text sources
-    python -c 'from fixtures import install; install()'
-
-    # run. should prob reverse proxy.
-    gunicorn app:app -D -b 0.0.0.0:8000
 
 ## changelog
 
