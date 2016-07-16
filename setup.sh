@@ -20,7 +20,7 @@ echo "starting postgresql"
 sudo service postgresql start
 
 echo "configuring postgresql"
-sudo su postgres -c "psql -c \"create user prosac with password 'prosiac'\""
+sudo su postgres -c "psql -c \"create user prosaic with password 'prosaic'\""
 sudo su postgres -c "createdb prosaic -O prosaic"
 
 echo "creating venv"
