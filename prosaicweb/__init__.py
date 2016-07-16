@@ -17,7 +17,7 @@ import sys
 
 from . import views
 from .cfg import DB
-from .models import Base
+from .models import Base, get_engine,Database
 from .views.auth import login, logout,  register
 from .app import app, bcrypt
 
@@ -50,7 +50,7 @@ for [route, name, fn, opts] in routes:
 def main() -> None:
     if len(sys.argv) > 1 and sys.argv[1] == 'dbinit':
         print('initializing prosaic and prosaicweb database state...')
-        Base.metadata.create_all(bind=get_engine(DB))
+        Base.metadata.create_all(bind=get_engine(Database(**DB))
         exit(0)
 
     app.run()
