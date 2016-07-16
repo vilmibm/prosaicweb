@@ -47,12 +47,12 @@ for [route, name, fn, opts] in routes:
     app.add_url_rule(route, name, fn, **opts)
 
 def main() -> None:
-    app.run()
-
-if __name__ == '__main__':
     if len(sys.argv) > 1 and sys.argv[1] == 'dbinit':
         print('initializing prosaic and prosaicweb database state...')
         Base.metadata.create_all()
         exit(0)
 
+    app.run()
+
+if __name__ == '__main__':
     main()

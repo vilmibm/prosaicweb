@@ -13,6 +13,7 @@ sudo apt-get -y install \
      build-essential \
      postgresql-server-dev-9.5 \
      python3-dev \
+     python3-venv \
      libffi-dev
 
 echo "starting postgresql"
