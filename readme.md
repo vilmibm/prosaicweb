@@ -4,25 +4,28 @@ _being a web frontend to [prosaic](https://github.com/nathanielksmith/prosaic)_.
 
 ## requirements
 
-* python >= 3.4
-* mongodb installed and running
-* gcc (for python deps)
+* python >= 3.5.1
+* recent debian / ubuntu
 * (optional) nginx for reverse proxying to gunicorn
 
 ## installation / deploy
 
-    # clone repo
+```bash
+    # get code
     git clone https://github.com/nathanielksmith/prosaicweb
     cd prosaicweb/prosaicweb
 
-    # set up virtualenv
-    virtualenv prosaicwebvenv -p $(which python3)
-    source prosaicwebvenv/bin/activate
-    pip install -r ../requirements.txt
-
-    # configure
-    cp example.cfg.py cfg.py
     # edit cfg.py and set the secret key
+    cp example.cfg.py cfg.py
+
+    # srsly read/review what this is going to do :)
+    cat setup.sh
+    bash setup.sh
+
+    # run it at port :8000 with gunicorn
+    bash run.sh
+
+```
 
     # install initial text sources
     python -c 'from fixtures import install; install()'
@@ -32,6 +35,7 @@ _being a web frontend to [prosaic](https://github.com/nathanielksmith/prosaic)_.
 
 ## changelog
 
+* 1.0.0 - kick that old shit to the curb
 * 0.0.2 - make it work on webkit, support site_name
 * 0.0.1 - initial release. user accounts, upload, template editing, corpus mixing.
 
