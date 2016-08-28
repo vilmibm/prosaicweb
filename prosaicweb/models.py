@@ -25,11 +25,15 @@ from sqlalchemy.dialects.postgresql import ARRAY, TEXT, INTEGER, JSON
 from sqlalchemy.ext.declarative import declarative_base
 from werkzeug.security import generate_password_hash, check_password_hash
 
+from .cfg import DB
+
 def get_engine(db: Database) -> Engine:
     return create_engine('postgresql://{user}:{password}@{host}:{port}/{dbname}'\
            .format(**db))
 
 Session = sessionmaker()
+engine = get_engine(DB)
+Session.configure(bind=engine)
 
 def get_session(db: Database):
     Session.configure(bind=get_engine(db))

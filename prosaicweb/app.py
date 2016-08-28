@@ -20,7 +20,7 @@ from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 
 from .cfg import DEBUG, SECRET_KEY, MAX_UPLOAD_SIZE, DB
-from .models import User, get_session, Database
+from .models import User, Database, Session
 from .util import ResponseData
 
 app = Flask('prosaicweb')
@@ -40,7 +40,7 @@ def unauthorized() -> ResponseData:
 
 @login_manager.user_loader
 def load_user(email: str) -> Optional[User]:
-    session = get_session(app.config['DB'])
+    session = Session()
     users = session.query(User).filter(User.email == email).all()
 
     if len(users) == 0:

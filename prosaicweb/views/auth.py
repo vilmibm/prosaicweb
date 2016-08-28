@@ -18,7 +18,7 @@ from flask import request, redirect, render_template, url_for, flash
 from flask_login import login_user, logout_user, login_required
 
 from ..app import bcrypt, app
-from ..models import User, get_session
+from ..models import User, Session
 from ..util import get_method, ResponseData
 
 BAD_CREDS_MSG = 'no such user or bad password'
@@ -30,7 +30,7 @@ def logout() -> ResponseData:
 
 def login() -> ResponseData:
     if request.method == 'POST':
-        session = get_session(app.config['DB'])
+        session = Session()
         email = request.form['email']
         password = request.form['password']
 
@@ -53,7 +53,7 @@ def register() -> ResponseData:
         return render_template('/register.html')
 
     if request.method == 'POST':
-        session = get_session(app.config['DB'])
+        session = Session()
         email = request.form['email']
         password = request.form['password']
         pwhash = bcrypt.generate_password_hash(password).decode()

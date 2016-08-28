@@ -22,7 +22,7 @@ from prosaic.parsing import process_text
 from prosaic.generation import poem_from_template
 
 from ..app import app
-from ..models import Source, Corpus, get_session, corpora_sources, Phrase, Template
+from ..models import Source, Corpus, corpora_sources, Phrase, Template, Session
 from ..util import get_method, auth_context, ResponseData, StringIOWrapper
 
 def index() -> ResponseData:
@@ -31,7 +31,7 @@ def index() -> ResponseData:
 @login_required
 def corpora() -> ResponseData:
     method = get_method(request)
-    session = get_session(app.config['DB'])
+    session = Session()
 
     if method == 'GET':
         context = auth_context(request)
@@ -53,7 +53,7 @@ def corpora() -> ResponseData:
 @login_required
 def corpus(corpus_id: str) -> ResponseData:
     method = get_method(request)
-    session = get_session(app.config['DB'])
+    session = Session()
 
     if method == 'GET':
         context = auth_context(request)
@@ -91,7 +91,7 @@ def corpus(corpus_id: str) -> ResponseData:
 @login_required
 def sources() -> ResponseData:
     method = get_method(request)
-    session = get_session(app.config['DB'])
+    session = Session()
 
     if method == 'GET':
         context = auth_context(request)
@@ -125,7 +125,7 @@ def sources() -> ResponseData:
 @login_required
 def source(source_id: str) -> ResponseData:
     method = request.form.get('_method', request.method)
-    session = get_session(app.config['DB'])
+    session = Session()
 
     if method == 'GET':
         context = auth_context(request)
@@ -165,7 +165,7 @@ def source(source_id: str) -> ResponseData:
 @login_required
 def phrases() -> ResponseData:
     method = get_method(request)
-    session = get_session(app.config['DB'])
+    session = Session()
 
     if method == 'DELETE':
         s = session.query(Source)\
@@ -186,7 +186,7 @@ def phrases() -> ResponseData:
 @login_required
 def templates() -> ResponseData:
     method = get_method(request)
-    session = get_session(app.config['DB'])
+    session = Session()
 
     if method == 'GET':
         context = auth_context(request)
@@ -206,7 +206,7 @@ def templates() -> ResponseData:
 @login_required
 def template(template_id: str) -> ResponseData:
     method = get_method(request)
-    session = get_session(app.config['DB'])
+    session = Session()
 
     if method == 'GET':
         context = auth_context(request)
@@ -233,7 +233,7 @@ def template(template_id: str) -> ResponseData:
 @login_required
 def generate() -> ResponseData:
     method = get_method(request)
-    session = get_session(app.config['DB'])
+    session = Session()
 
     if method == 'GET':
         context = auth_context(request)
