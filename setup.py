@@ -20,7 +20,7 @@ setup(
                         'flask-login==0.3.2',
                         'flask-bcrypt==0.7.1',
                         'psycopg2==2.6.1',
-                        'prosaic==5.1.0',
+                        'prosaic==6.0.0',
                         'gunicorn==19.6.0',],
     entry_points = {
           'console_scripts': [
