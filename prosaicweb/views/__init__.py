@@ -13,6 +13,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from io import StringIO
 import json
 
 from flask import render_template, request, redirect, Response, url_for, flash
@@ -22,7 +23,7 @@ from prosaic.generation import poem_from_template
 
 from ..app import app
 from ..models import Source, Corpus, get_session, corpora_sources, Phrase, Template
-from ..util import get_method, auth_context, ResponseData
+from ..util import get_method, auth_context, ResponseData, StringIOWrapper
 
 def index() -> ResponseData:
     return render_template('index.html', **auth_context(request))
@@ -105,21 +106,21 @@ def sources() -> ResponseData:
         s = Source()
         s.name = request.form['source_name']
         s.description = request.form['source_description']
-        content = ''
+        content = None
         if len(request.form['content_paste']) > 0:
-            content = request.form['content_paste']
+            content = StringIO(request.form['content_paste'])
         elif request.files.get('content_file'):
-            content = str(request.files['content_file'].read())
+            content = StringIOWrapper(request.files['content_file'].stream)
 
-        if len(content) == 0:
+        if content is None:
             flash('Got empty content for source.')
             return redirect(url_for('sources'))
 
-        session.add(s)
-        process_text(s, content)
-        session.commit()
+        # TODO handle error
+        source_id = process_text(app.config['DB'], s, content)
+        content.close()
 
-        return redirect(url_for('source', source_id=s.id))
+        return redirect(url_for('source', source_id=source_id))
 
 @login_required
 def source(source_id: str) -> ResponseData:
@@ -141,7 +142,8 @@ def source(source_id: str) -> ResponseData:
         new_content = request.form['source_content']
         if new_content != s.content:
             session.query(Phrase).filter(Phrase.source_id == s.id).delete()
-            process_text(s, new_content)
+            session.expunge(s)
+            process_text(app.config['DB'], s, StringIO(new_content))
         session.commit()
 
         return redirect(url_for('sources'))
